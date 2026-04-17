@@ -62,7 +62,25 @@ button{
     color:white;
     border-radius:5px;
     cursor:pointer;
+    
 }
+    .form-box{
+  max-width:300px;
+  margin:20px auto;
+}
+
+.form-box input{
+  width:100%;
+  padding:6px;
+  font-size:14px;
+}
+
+.form-box button{
+  width:100%;
+  padding:6px;
+  font-size:14px;
+}
+    
 body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;}
 
 header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
@@ -213,27 +231,30 @@ db.collection("pedidos").doc(id).delete();
 </div>
 
 <!-- PEDIDO -->
-<div id="pedido" class="page">
-<div class="card">
-<h2>🎵 Pedir Música</h2>
 
-<input id="nomeInput" placeholder="Nome">
-<input id="musicaInput" placeholder="Música">
-<input id="cantorInput" placeholder="Cantor">
-
-<button onclick="enviarPedido()">Enviar</button>
+<div style="text-align:center;">
+<button onclick="mostrar('pedido')">🎵 Pedir Música</button>
+<button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
-<input id="email" placeholder="Email">
-<input id="senha" type="password" placeholder="Senha">
+<!-- PEDIDO -->
+<div id="pedido" class="page active">
+<h3 style="text-align:center;">🎵 Pedido</h3>
 
-<button onclick="login()">Entrar</button>
-<button onclick="cadastro()">Cadastrar</button>
+<div class="form-box">
+<input id="nome" placeholder="Seu nome">
+<input id="musica" placeholder="Música">
+<input id="cantor" placeholder="Cantor">
 
-<div class="card admin" id="admin">
-<h2>Admin</h2>
+<button onclick="enviarPedido()">Enviar Pedido</button>
+</div>
+
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="admin">
+<h3>📋 Pedidos Recebidos</h3>
 <div id="lista"></div>
-</div>
 </div>
 
 <!-- PLAYER -->
@@ -246,6 +267,70 @@ db.collection("pedidos").doc(id).delete();
 
 <script>
 
+// ===== TROCA DE TELA =====
+function mostrar(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById(p).classList.add("active");
+}
+
+// ===== SALVAR PEDIDO LOCAL =====
+function enviarPedido(){
+
+let nome = document.getElementById("nome").value;
+let musica = document.getElementById("musica").value;
+let cantor = document.getElementById("cantor").value;
+
+if(!nome || !musica || !cantor){
+alert("Preencha tudo!");
+return;
+}
+
+// pega lista atual
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+// adiciona novo
+pedidos.push({
+  nome,
+  musica,
+  cantor,
+  data: new Date().toLocaleString()
+});
+
+// salva
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+alert("Pedido enviado!");
+
+// limpa campos
+document.getElementById("nome").value="";
+document.getElementById("musica").value="";
+document.getElementById("cantor").value="";
+}
+
+// ===== ADMIN =====
+function abrirAdmin(){
+
+let senha = prompt("Digite a senha:");
+
+if(senha !== "928374"){
+alert("Senha errada!");
+return;
+}
+
+document.getElementById("admin").style.display="block";
+
+// pega pedidos
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+let lista = document.getElementById("lista");
+lista.innerHTML="";
+
+if(pedidos.length === 0){
+lista.innerHTML="Nenhum pedido ainda";
+return;
+}
+
+    
 // UI
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
