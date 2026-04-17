@@ -167,20 +167,7 @@ if(senha!=="928374") return;
 
 admin.style.display="block";
 
-db.collection("pedidos").onSnapshot(snap=>{
-lista.innerHTML="";
-snap.forEach(d=>{
-let x=d.data();
-lista.innerHTML+=`
-<div class="pedido">
-<b>${x.nome}</b><br>
-🎵 ${x.musica}<br>
-🎤 ${x.cantor}<br>
-<button onclick="apagar('${d.id}')">Excluir</button>
-</div>`;
-});
-});
-}
+
 
 // ===== APAGAR =====
 function apagar(id){
@@ -312,7 +299,7 @@ function abrirAdmin(){
 
 let senha = prompt("Digite a senha:");
 
-if(senha !== "928374"){
+if(senha !==  "928374"){
 alert("Senha errada!");
 return;
 }
@@ -329,7 +316,18 @@ if(pedidos.length === 0){
 lista.innerHTML="Nenhum pedido ainda";
 return;
 }
-
+pedidos.forEach((p, i)=>{
+lista.innerHTML += `
+<div style="margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:5px;">
+<b>${p.nome}</b><br>
+🎵 ${p.musica}<br>
+🎤 ${p.cantor}<br>
+🕒 ${p.data}<br>
+<button onclick="apagar(${i})">Excluir</button>
+</div>
+`;
+});
+}
     
 // UI
 function mostrar(p){
@@ -389,7 +387,7 @@ musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+" Ouvintes 🟡";
+ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
 },3000);
 
 </script>
