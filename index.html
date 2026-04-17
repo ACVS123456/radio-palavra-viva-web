@@ -212,6 +212,20 @@ db.collection("pedidos").doc(id).delete();
 <div class="card">🔄 Atualize se parar</div>
 </div>
 </div>
+</head>
+
+    
+<body>
+
+<header>
+<h2>📻 Rádio Palavra Viva</h2>
+</header>
+
+<div class="banner">
+<h3 id="ouvintes">👥 Ouvindo agora: 1</h3>
+</div>
+
+    
 
 <!-- PEDIDO -->
 
@@ -323,6 +337,18 @@ lista.innerHTML += `
 </div>
 `;
 });
+}
+    
+// ===== APAGAR =====
+function apagar(index){
+
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+pedidos.splice(index,1);
+
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+abrirAdmin(); // atualiza lista
 }
     
 // UI
