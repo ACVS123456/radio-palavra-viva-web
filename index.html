@@ -78,6 +78,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <!-- MENU -->
 <div style="text-align:center;">
+<button onclick="mostrar('home')">🏠 Início</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
@@ -235,7 +236,7 @@ musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
+ouvintes.innerText=Math.floor("🟡 Ouvintes";(Math.random()*200);
 },3000);
 
 /* 🔥 LED SUAVE ERICSSON */
