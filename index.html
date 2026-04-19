@@ -24,7 +24,8 @@ background:#444;transition:0.5s;
 .page{display:none;padding:15px;}
 .active{display:block;}
 
-.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;text-align:center;}
+.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;}
+
 .card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
 
 .player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
@@ -70,23 +71,33 @@ transform-origin:bottom;transition:0.05s;
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
 </div>
+
+<div class="card">📻 24h no ar</div>
+<div class="card">🎤 Programas ao vivo</div>
 </div>
 
 <!-- MENU -->
 <div>
 <button onclick="mostrar('home')">🏠 Home</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
+<button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
 <!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
 
-<input id="nome" placeholder="Seu nome">
+<input id="nomeInput" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
-<input id="cantor" placeholder="Cantor">
+<input id="cantorInput" placeholder="Cantor">
 
-<button onclick="enviarPedido()">Enviar</button>
+<button onclick="enviarPedido()">Enviar Pedido</button>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" style="display:none">
+<h3>📋 Pedidos</h3>
+<div id="lista"></div>
 </div>
 
 <!-- PLAYER -->
@@ -112,7 +123,7 @@ src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 <div class="vu" id="vu"></div>
 
 <script>
-// ===== ELEMENTOS =====
+// ELEMENTOS
 const audio = document.getElementById("audio");
 const btn = document.getElementById("btn");
 const volume = document.getElementById("volume");
@@ -120,10 +131,10 @@ const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
-// ===== PLAY =====
+// PLAY
 function play(){
 
-if(!ctx){ initAudio(); }
+if(!ctx) initAudio();
 
 if(audio.paused){
 audio.play();
@@ -141,34 +152,81 @@ statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// ===== VOLUME =====
+// VOLUME
 volume.oninput=()=>audio.volume=volume.value;
 
-// ===== PEDIDOS =====
-function enviarPedido(){
-let nome=nome.value, musica=musicaInput.value, cantor=cantor.value;
-if(!nome||!musica||!cantor)return alert("Preencha tudo");
-
-let p=JSON.parse(localStorage.getItem("pedidos"))||[];
-p.push({nome,musica,cantor,data:new Date().toLocaleString()});
-localStorage.setItem("pedidos",JSON.stringify(p));
-
-alert("Enviado!");
-nome.value=musicaInput.value=cantor.value="";
+// TROCA DE TELA
+function mostrar(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById(p).classList.add("active");
 }
 
-// ===== RELÓGIO =====
+// PEDIDO
+function enviarPedido(){
+
+let nome=document.getElementById("nomeInput").value;
+let musica=document.getElementById("musicaInput").value;
+let cantor=document.getElementById("cantorInput").value;
+
+if(!nome||!musica||!cantor) return alert("Preencha tudo");
+
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+
+pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
+
+localStorage.setItem("pedidos",JSON.stringify(pedidos));
+
+alert("Pedido enviado!");
+
+document.getElementById("nomeInput").value="";
+document.getElementById("musicaInput").value="";
+document.getElementById("cantorInput").value="";
+}
+
+// ADMIN
+function abrirAdmin(){
+let senha=prompt("Senha:");
+if(senha!=="928374") return alert("Errado");
+
+document.getElementById("admin").style.display="block";
+carregarPedidos();
+}
+
+function carregarPedidos(){
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+let lista=document.getElementById("lista");
+
+lista.innerHTML="";
+
+pedidos.forEach((p,i)=>{
+lista.innerHTML+=`
+<div>
+<b>${p.nome}</b><br>
+${p.musica} - ${p.cantor}<br>
+<button onclick="apagar(${i})">Excluir</button>
+</div>`;
+});
+}
+
+function apagar(i){
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+pedidos.splice(i,1);
+localStorage.setItem("pedidos",JSON.stringify(pedidos));
+carregarPedidos();
+}
+
+// RELÓGIO
 setInterval(()=>{
 time.innerText=new Date().toLocaleTimeString();
 date.innerText=new Date().toLocaleDateString();
 },1000);
 
-// ===== LED =====
+// LED
 setInterval(()=>{
 if(!ligado){
 led1.style.background="#444";return;
 }
-led1.style.background = led1.style.background=="lime"?"#444":"lime";
+led1.style.background=led1.style.background=="lime"?"#444":"lime";
 },1000);
 
 // ===== VU =====
@@ -187,6 +245,7 @@ let smooth=new Array(50).fill(0);
 
 function initAudio(){
 ctx=new (window.AudioContext||window.webkitAudioContext)();
+
 analyser=ctx.createAnalyser();
 analyser.fftSize=512;
 
@@ -194,6 +253,7 @@ gainNode=ctx.createGain();
 gainNode.gain.value=gainSlider.value;
 
 let src=ctx.createMediaElementSource(audio);
+
 src.connect(gainNode);
 gainNode.connect(analyser);
 analyser.connect(ctx.destination);
@@ -219,7 +279,6 @@ smooth[i]=smooth[i]*0.6+v*0.4;
 let h=Math.min(smooth[i],140);
 bars[i].style.height=h+"px";
 
-// CORES
 if(h<50) bars[i].style.background="#00ff00";
 else if(h<90) bars[i].style.background="#ffff00";
 else bars[i].style.background="#ff0000";
