@@ -15,10 +15,7 @@ header h1{color:#1db954;font-size:16px;}
 
 .status-top{display:flex;align-items:center;gap:10px;}
 
-#led1{
-width:10px;height:10px;border-radius:50%;
-background:#444;transition:0.5s;
-}
+#led1{width:10px;height:10px;border-radius:50%;background:#444;transition:0.5s;}
 
 .clock{text-align:center;}
 .page{display:none;padding:15px;}
@@ -33,23 +30,14 @@ button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;
 
 input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
-.admin{display:none;}
-.form-box{max-width:300px;margin:20px auto;}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
 
 .volume-box{margin-top:10px;}
 input[type="range"]{width:80%;}
 
 /* VU */
-.vu{
-display:flex;justify-content:center;align-items:flex-end;
-gap:2px;margin-top:20px;height:140px;
-}
-.bar{
-width:6px;height:10px;border-radius:3px;
-transform-origin:bottom;transition:0.05s;
-}
+.vu{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:20px;height:140px;}
+.bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;transition:0.05s;}
 </style>
 </head>
 
@@ -60,11 +48,10 @@ transform-origin:bottom;transition:0.05s;
 
 <div class="status-top">
 <div id="led1"></div>
-<div id="led2"></div>
 
 <div class="clock">
-<div id="time">00:00:00</div>
-<div id="date">--/--/----</div>
+<div id="time"></div>
+<div id="date"></div>
 </div>
 </div>
 </header>
@@ -97,16 +84,15 @@ transform-origin:bottom;transition:0.05s;
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
 
-<div class="form-box">
 <input id="nome" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
 <input id="cantor" placeholder="Cantor">
+
 <button onclick="enviarPedido()">Enviar Pedido</button>
-</div>
 </div>
 
 <!-- ADMIN -->
-<div id="admin" class="admin">
+<div id="admin" style="display:none">
 <h3>📋 Pedidos Recebidos</h3>
 <div id="lista"></div>
 </div>
@@ -117,27 +103,26 @@ transform-origin:bottom;transition:0.05s;
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<!-- AUDIO (APENAS UM!) -->
+<!-- 🔥 ÚNICO AUDIO -->
 <audio id="audio" crossorigin="anonymous"
 src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
-<!-- CONTROLES -->
 <button onclick="toggleMute()">🔇 Mudo</button>
 
 <div class="volume-box">
-🔊 Volume:
+🔊 Volume
 <input type="range" min="0" max="1" step="0.01" value="1" id="volume">
 </div>
 
 <div class="volume-box">
-🎚️ Sensibilidade:
+🎚️ Sensibilidade
 <input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
 </div>
 
 <div class="vu" id="vu"></div>
 
 <script>
-// ELEMENTOS
+// ===== ELEMENTOS =====
 const audio = document.getElementById("audio");
 const btn = document.getElementById("btn");
 const volumeSlider = document.getElementById("volume");
@@ -145,7 +130,7 @@ const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
-// PLAY
+// ===== PLAYER =====
 function play(){
 
 if(!ctx) initAudio();
@@ -166,21 +151,21 @@ statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// MUTE
+// ===== MUTE =====
 function toggleMute(){
 audio.muted=!audio.muted;
 }
 
-// VOLUME
+// ===== VOLUME =====
 volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
 
-// TELAS
+// ===== TELAS =====
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// PEDIDOS
+// ===== PEDIDOS =====
 function enviarPedido(){
 let nome=nome.value.trim();
 let musica=musicaInput.value.trim();
@@ -194,11 +179,10 @@ pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
 localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
 alert("Pedido enviado!");
-
 nome.value=musicaInput.value=cantor.value="";
 }
 
-// ADMIN
+// ===== ADMIN =====
 function abrirAdmin(){
 let senha=prompt("Digite a senha:");
 if(senha!=="928374") return alert("Senha errada!");
@@ -237,13 +221,13 @@ localStorage.setItem("pedidos",JSON.stringify(pedidos));
 carregarPedidos();
 }
 
-// RELÓGIO
+// ===== RELÓGIO =====
 setInterval(()=>{
 time.innerText=new Date().toLocaleTimeString();
 date.innerText=new Date().toLocaleDateString();
 },1000);
 
-// LED
+// ===== LED =====
 setInterval(()=>{
 if(!ligado){
 led1.style.background="#444";return;
@@ -251,7 +235,7 @@ led1.style.background="#444";return;
 led1.style.background=led1.style.background=="lime"?"#444":"lime";
 },1000);
 
-// SIMULAÇÕES
+// ===== SIMULAÇÃO =====
 setInterval(()=>{
 if(!ligado) return;
 musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
