@@ -51,6 +51,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <div class="status-top">
 <div id="led1"></div>
+  <div id="led2"></div>
 
 <div class="clock">
 <div id="time">00:00:00</div>
@@ -78,6 +79,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <!-- MENU -->
 <div style="text-align:center;">
+  <button onclick="mostrar('home')">🏠 Início</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
@@ -235,7 +237,7 @@ musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
+ouvintes.innerText=Math.floor(Math.random()*200)+" 🟡 " Ouvintes";
 },3000);
 
 /* 🔥 LED SUAVE ERICSSON */
