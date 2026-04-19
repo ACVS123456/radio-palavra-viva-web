@@ -15,9 +15,8 @@ header h1{color:#1db954;font-size:16px;}
 
 .status-top{display:flex;align-items:center;gap:10px;}
 
-#led1{width:10px;height:10px;border-radius:50%;background:#444;transition:0.5s;}
+#led1{width:10px;height:10px;border-radius:50%;background:#444;}
 
-.clock{text-align:center;}
 .page{display:none;padding:15px;}
 .active{display:block;}
 
@@ -35,9 +34,8 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 .volume-box{margin-top:10px;}
 input[type="range"]{width:80%;}
 
-/* VU */
 .vu{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:20px;height:140px;}
-.bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;transition:0.05s;}
+.bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;}
 </style>
 </head>
 
@@ -49,14 +47,13 @@ input[type="range"]{width:80%;}
 <div class="status-top">
 <div id="led1"></div>
 
-<div class="clock">
+<div>
 <div id="time"></div>
 <div id="date"></div>
 </div>
 </div>
 </header>
 
-<!-- HOME -->
 <div id="home" class="page active">
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
@@ -68,42 +65,35 @@ input[type="range"]{width:80%;}
 <div class="card">📻 24h no ar</div>
 <div class="card">🎤 Programas ao vivo</div>
 <div class="card">🔥 Hits atualizados</div>
-<div class="card">▶️ Aguarde 10s após clicar</div>
-<div class="card">🔄 Atualize se parar</div>
 </div>
 </div>
 
-<!-- MENU -->
 <div>
 <button onclick="mostrar('home')">🏠 Home</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
-<!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
 
-<input id="nome" placeholder="Seu nome">
-<input id="musicaInput" placeholder="Música">
-<input id="cantor" placeholder="Cantor">
+<input id="inputNome" placeholder="Seu nome">
+<input id="inputMusica" placeholder="Música">
+<input id="inputCantor" placeholder="Cantor">
 
 <button onclick="enviarPedido()">Enviar Pedido</button>
 </div>
 
-<!-- ADMIN -->
 <div id="admin" style="display:none">
-<h3>📋 Pedidos Recebidos</h3>
+<h3>📋 Pedidos</h3>
 <div id="lista"></div>
 </div>
 
-<!-- PLAYER -->
 <div class="player">
 <button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<!-- 🔥 ÚNICO AUDIO -->
 <audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
 <button onclick="toggleMute()">🔇 Mudo</button>
@@ -121,54 +111,64 @@ input[type="range"]{width:80%;}
 <div class="vu" id="vu"></div>
 
 <script>
-// ===== ELEMENTOS =====
 const audio = document.getElementById("audio");
 const btn = document.getElementById("btn");
+const statusPlayer = document.getElementById("statusPlayer");
+const statusTopo = document.getElementById("statusTopo");
+const musicaEl = document.getElementById("musica");
+const ouvintesEl = document.getElementById("ouvintes");
+const led = document.getElementById("led1");
+
 const volumeSlider = document.getElementById("volume");
 const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
-// ===== PLAYER =====
+// PLAYER
 function play(){
 
 if(!ctx) initAudio();
 
 if(audio.paused){
-audio.play();
+audio.play().catch(()=>alert("Clique novamente"));
 animateVU();
+
 btn.innerHTML='<i class="fas fa-pause"></i>';
 ligado=true;
+
 statusPlayer.innerText="🔴 AO VIVO";
 statusTopo.innerText="🔴 AO VIVO";
+
 }else{
 audio.pause();
+
 btn.innerHTML='<i class="fas fa-play"></i>';
 ligado=false;
+
 statusPlayer.innerText="⚫ OFFLINE";
 statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// ===== MUTE =====
+// MUTE
 function toggleMute(){
 audio.muted=!audio.muted;
 }
 
-// ===== VOLUME =====
+// VOLUME
 volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
 
-// ===== TELAS =====
+// TELAS
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// ===== PEDIDOS =====
+// PEDIDOS
 function enviarPedido(){
-let nome=nome.value.trim();
-let musica=musicaInput.value.trim();
-let cantor=cantor.value.trim();
+let nome=document.getElementById("inputNome").value.trim();
+let musica=document.getElementById("inputMusica").value.trim();
+let cantor=document.getElementById("inputCantor").value.trim();
 
 if(!nome||!musica||!cantor) return alert("Preencha tudo!");
 
@@ -178,13 +178,16 @@ pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
 localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
 alert("Pedido enviado!");
-nome.value=musicaInput.value=cantor.value="";
+
+document.getElementById("inputNome").value="";
+document.getElementById("inputMusica").value="";
+document.getElementById("inputCantor").value="";
 }
 
-// ===== ADMIN =====
+// ADMIN
 function abrirAdmin(){
-let senha=prompt("Digite a senha:");
-if(senha!=="928374") return alert("Senha errada!");
+let senha=prompt("Senha:");
+if(senha!=="928374") return alert("Errada");
 
 document.getElementById("admin").style.display="block";
 carregarPedidos();
@@ -196,11 +199,6 @@ let lista=document.getElementById("lista");
 
 lista.innerHTML="";
 
-if(pedidos.length===0){
-lista.innerHTML="Nenhum pedido ainda";
-return;
-}
-
 pedidos.forEach((p,i)=>{
 lista.innerHTML+=`
 <div>
@@ -209,7 +207,7 @@ lista.innerHTML+=`
 🎤 ${p.cantor}<br>
 🕒 ${p.data}<br>
 <button onclick="apagar(${i})">Excluir</button>
-</div>`;
+</div><hr>`;
 });
 }
 
@@ -220,32 +218,30 @@ localStorage.setItem("pedidos",JSON.stringify(pedidos));
 carregarPedidos();
 }
 
-// ===== RELÓGIO =====
+// RELÓGIO
 setInterval(()=>{
-time.innerText=new Date().toLocaleTimeString();
-date.innerText=new Date().toLocaleDateString();
+document.getElementById("time").innerText=new Date().toLocaleTimeString();
+document.getElementById("date").innerText=new Date().toLocaleDateString();
 },1000);
 
-// ===== LED =====
+// LED
 setInterval(()=>{
-if(!ligado){
-led1.style.background="#444";return;
-}
-led1.style.background=led1.style.background=="lime"?"#444":"lime";
+if(!ligado){led.style.background="#444";return;}
+led.style.background=led.style.background=="lime"?"#444":"lime";
 },1000);
 
-// ===== SIMULAÇÃO =====
+// SIMULAÇÃO
 setInterval(()=>{
 if(!ligado) return;
-musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
+musicaEl.innerText="🎵 Tocando: Música "+Math.floor(Math.random()*100);
 },4000);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+" 🟡 Ouvintes";
+ouvintesEl.innerText=Math.floor(Math.random()*200)+" ouvintes";
 },3000);
 
-// ===== VU =====
+// VU
 const vu=document.getElementById("vu");
 const bars=[];
 
@@ -289,17 +285,14 @@ if(!analyser) return;
 analyser.getByteFrequencyData(dataArray);
 
 for(let i=0;i<bars.length;i++){
-let v=Math.pow((dataArray[i]||0)/255,1.5)*180;
+let v=(dataArray[i]||0)/255*140;
 smooth[i]=smooth[i]*0.6+v*0.4;
 
-let h=Math.min(smooth[i],140);
-bars[i].style.height=h+"px";
+bars[i].style.height=smooth[i]+"px";
 
-if(h<50) bars[i].style.background="#00ff00";
-else if(h<90) bars[i].style.background="#ffff00";
+if(smooth[i]<50) bars[i].style.background="#00ff00";
+else if(smooth[i]<90) bars[i].style.background="#ffff00";
 else bars[i].style.background="#ff0000";
-
-bars[i].style.boxShadow="0 0 8px "+bars[i].style.background;
 }
 }
 </script>
