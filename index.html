@@ -9,31 +9,20 @@
 
 <style>
 body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;text-align:center;}
-
 header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
 header h1{color:#1db954;font-size:16px;}
-
 .status-top{display:flex;align-items:center;gap:10px;}
-
 #led1{width:10px;height:10px;border-radius:50%;background:#444;}
-
 .page{display:none;padding:15px;}
 .active{display:block;}
-
 .banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;}
 .card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
-
 .player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
-
 button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;cursor:pointer;margin:5px;}
-
 input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
-
 .volume-box{margin-top:10px;}
 input[type="range"]{width:80%;}
-
 .vu{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:20px;height:140px;}
 .bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;}
 </style>
@@ -43,10 +32,8 @@ input[type="range"]{width:80%;}
 
 <header>
 <h1>Rádio Palavra Viva-WEB</h1>
-
 <div class="status-top">
 <div id="led1"></div>
-
 <div>
 <div id="time"></div>
 <div id="date"></div>
@@ -54,7 +41,6 @@ input[type="range"]{width:80%;}
 </div>
 </header>
 
-<!-- HOME -->
 <div id="home" class="page active">
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
@@ -69,41 +55,32 @@ input[type="range"]{width:80%;}
 </div>
 </div>
 
-<!-- MENU -->
 <div>
 <button onclick="mostrar('home')">🏠 Home</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
-<!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
-
 <input id="inputNome" placeholder="Seu nome">
 <input id="inputMusica" placeholder="Música">
 <input id="inputCantor" placeholder="Cantor">
-
 <button onclick="enviarPedido()">Enviar Pedido</button>
 </div>
 
-<!-- ADMIN -->
 <div id="admin" style="display:none">
 <h3>📋 Pedidos</h3>
 <div id="lista"></div>
 </div>
 
-<!-- PLAYER -->
 <div class="player">
 <button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
 <span id="statusPlayer">OFFLINE</span>
+<button onclick="toggleMute()">🔇</button>
 </div>
 
-<!-- 🔥 ÚNICO AUDIO -->
-<audio id="audio" crossorigin="anonymous"
-src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
-
-<button onclick="toggleMute()">🔇 Mudo</button>
+<audio id="audio" crossorigin="anonymous"></audio>
 
 <div class="volume-box">
 🔊 Volume
@@ -118,10 +95,30 @@ src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 <div class="vu" id="vu"></div>
 
 <script>
-// ===== ELEMENTOS =====
+// ===== STREAM =====
 const audio = document.getElementById("audio");
-audio.crossOrigin = "anonymous";
+const streams = [
+"https://heights-blue-hub-remember.trycloudflare.com/stream",
+"https://stream.zeno.fm/0r0xa792kwzuv"
+];
+let atual = 0;
 
+function carregarStream(){
+audio.src = streams[atual];
+audio.load();
+}
+
+audio.onerror = ()=>{
+atual++;
+if(atual < streams.length){
+carregarStream();
+audio.play();
+}else{
+alert("Nenhuma stream funcionando");
+}
+};
+
+// ===== ELEMENTOS =====
 const btn = document.getElementById("btn");
 const statusPlayer = document.getElementById("statusPlayer");
 const statusTopo = document.getElementById("statusTopo");
@@ -134,25 +131,51 @@ const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
-// ===== PLAYER =====
+// ===== AUDIO CONTEXT =====
+let ctx, analyser, dataArray, source, gainNode;
+let iniciado=false;
+
+function initAudio(){
+if(iniciado) return;
+
+ctx=new (window.AudioContext||window.webkitAudioContext)();
+
+analyser=ctx.createAnalyser();
+analyser.fftSize=512;
+
+gainNode=ctx.createGain();
+gainNode.gain.value=gainSlider.value;
+
+source=ctx.createMediaElementSource(audio);
+
+source.connect(gainNode);
+gainNode.connect(analyser);
+analyser.connect(ctx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+iniciado=true;
+}
+
+// ===== PLAY =====
 function play(){
 
-if(!ctx) initAudio();
+if(!audio.src) carregarStream();
 
-// 🔓 desbloqueia áudio no navegador
-if(ctx && ctx.state === "suspended"){
-    ctx.resume();
-}
+if(!iniciado) initAudio();
+
+if(ctx.state==="suspended") ctx.resume();
 
 if(audio.paused){
 audio.play().catch(()=>alert("Clique novamente"));
-animateVU();
 
 btn.innerHTML='<i class="fas fa-pause"></i>';
 ligado=true;
 
 statusPlayer.innerText="🔴 AO VIVO";
 statusTopo.innerText="🔴 AO VIVO";
+
+animateVU();
 
 }else{
 audio.pause();
@@ -165,13 +188,10 @@ statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// ===== MUTE =====
-function toggleMute(){
-audio.muted=!audio.muted;
-}
-
-// ===== VOLUME =====
+// ===== CONTROLES =====
+function toggleMute(){audio.muted=!audio.muted;}
 volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
+gainSlider.oninput=()=>{if(gainNode) gainNode.gain.value=gainSlider.value;};
 
 // ===== TELAS =====
 function mostrar(p){
@@ -181,22 +201,21 @@ document.getElementById(p).classList.add("active");
 
 // ===== PEDIDOS =====
 function enviarPedido(){
-let nome=document.getElementById("inputNome").value.trim();
-let musica=document.getElementById("inputMusica").value.trim();
-let cantor=document.getElementById("inputCantor").value.trim();
+let nome=inputNome.value.trim();
+let musica=inputMusica.value.trim();
+let cantor=inputCantor.value.trim();
 
 if(!nome||!musica||!cantor) return alert("Preencha tudo!");
 
 let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-
 pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
 localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
 alert("Pedido enviado!");
 
-document.getElementById("inputNome").value="";
-document.getElementById("inputMusica").value="";
-document.getElementById("inputCantor").value="";
+inputNome.value="";
+inputMusica.value="";
+inputCantor.value="";
 }
 
 // ===== ADMIN =====
@@ -204,14 +223,12 @@ function abrirAdmin(){
 let senha=prompt("Senha:");
 if(senha!=="928374") return alert("Errada");
 
-document.getElementById("admin").style.display="block";
+admin.style.display="block";
 carregarPedidos();
 }
 
 function carregarPedidos(){
 let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-let lista=document.getElementById("lista");
-
 lista.innerHTML="";
 
 pedidos.forEach((p,i)=>{
@@ -235,8 +252,8 @@ carregarPedidos();
 
 // ===== RELÓGIO =====
 setInterval(()=>{
-document.getElementById("time").innerText=new Date().toLocaleTimeString();
-document.getElementById("date").innerText=new Date().toLocaleDateString();
+time.innerText=new Date().toLocaleTimeString();
+date.innerText=new Date().toLocaleDateString();
 },1000);
 
 // ===== LED =====
@@ -259,7 +276,6 @@ ouvintesEl.innerText=Math.floor(Math.random()*200)+" ouvintes";
 // ===== VU =====
 const vu=document.getElementById("vu");
 const bars=[];
-
 for(let i=0;i<50;i++){
 let b=document.createElement("div");
 b.classList.add("bar");
@@ -267,30 +283,7 @@ vu.appendChild(b);
 bars.push(b);
 }
 
-let ctx, analyser, dataArray, gainNode;
 let smooth=new Array(50).fill(0);
-
-function initAudio(){
-ctx=new (window.AudioContext||window.webkitAudioContext)();
-
-analyser=ctx.createAnalyser();
-analyser.fftSize=512;
-
-gainNode=ctx.createGain();
-gainNode.gain.value=gainSlider.value;
-
-let src=ctx.createMediaElementSource(audio);
-
-src.connect(gainNode);
-gainNode.connect(analyser);
-analyser.connect(ctx.destination);
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-}
-
-gainSlider.oninput=()=>{
-if(gainNode) gainNode.gain.value=gainSlider.value;
-};
 
 function animateVU(){
 requestAnimationFrame(animateVU);
@@ -304,10 +297,7 @@ let v=(dataArray[i]||0)/255*140;
 smooth[i]=smooth[i]*0.6+v*0.4;
 
 bars[i].style.height=smooth[i]+"px";
-
-if(smooth[i]<50) bars[i].style.background="#00ff00";
-else if(smooth[i]<90) bars[i].style.background="#ffff00";
-else bars[i].style.background="#ff0000";
+bars[i].style.background = smooth[i]<50?"#00ff00":smooth[i]<90?"#ffff00":"#ff0000";
 }
 }
 </script>
