@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rádio Palavra Viva - WEB PRO</title>
+<title>Rádio Palavra Viva - WEB</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+
 body{
     margin:0;
     font-family:'Segoe UI';
     background:#0d1117;
     color:white;
-    text-align:center;
     padding-bottom:90px;
 }
 
@@ -27,34 +27,35 @@ header{
     flex-wrap:wrap;
 }
 
-header h1{
-    color:#1db954;
-    font-size:16px;
-}
+header h1{color:#1db954;font-size:16px;}
 
-/* STATUS */
-.status-top{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+.status-top{display:flex;align-items:center;gap:10px;}
 
-#led1{
+#led{
     width:10px;
     height:10px;
     border-radius:50%;
     background:#444;
 }
 
-/* PÁGINAS */
+/* PAGES */
 .page{display:none;padding:15px;}
 .active{display:block;}
 
-/* CARDS */
+/* BANNER */
 .banner{
     background:linear-gradient(135deg,#1db954,#000);
     padding:25px;
     border-radius:10px;
+    text-align:center;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-top:10px;
 }
 
 .card{
@@ -64,34 +65,24 @@ header h1{
     font-size:14px;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+/* BOTÕES MENU */
+.menu{
+    display:flex;
+    justify-content:center;
     gap:10px;
-    margin-top:10px;
+    margin:10px 0;
 }
 
-/* BOTÕES */
 button{
     background:#1db954;
     border:none;
-    padding:8px 12px;
+    padding:8px 10px;
     color:white;
     border-radius:5px;
     cursor:pointer;
-    margin:5px;
 }
 
-/* INPUT */
-input{
-    padding:8px;
-    border-radius:5px;
-    border:none;
-    width:90%;
-    margin:5px 0;
-}
-
-/* PLAYER FIXO */
+/* PLAYER */
 .player{
     position:fixed;
     bottom:0;
@@ -99,60 +90,70 @@ input{
     background:#161b22;
     display:flex;
     align-items:center;
-    justify-content:center;
     gap:10px;
     padding:10px;
 }
 
 /* VOLUME */
-.volume-box{
-    margin-top:10px;
+.player input[type="range"]{
+    width:120px;
 }
 
-input[type="range"]{
-    width:80%;
+/* INPUTS */
+input{
+    padding:8px;
+    border-radius:5px;
+    border:none;
+    width:100%;
+    margin:5px 0;
 }
 
-/* VU METER PRO */
+/* VU */
 .vu{
     display:flex;
     justify-content:center;
     align-items:flex-end;
     gap:2px;
-    margin-top:25px;
-    height:140px;
+    margin-top:20px;
+    height:120px;
 }
 
 .bar{
-    width:6px;
+    width:5px;
     height:10px;
+    background:#00ff2a;
     border-radius:3px;
-    transform-origin:bottom;
-    transition:0.05s;
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>🌐Rádio Palavra Viva WEB PRO</h1>
-
+<h1>🌐Rádio Palavra Viva WEB</h1>
 <div class="status-top">
-<div id="led1"></div>
-<div>
-<div id="time"></div>
-<div id="date"></div>
-</div>
+<div id="led"></div>
 </div>
 </header>
 
+<!-- MENU -->
+<div class="menu">
+<button onclick="show('home')">🏠 Home</button>
+<button onclick="show('pedido')">🎵 Pedido</button>
+<button onclick="openAdmin()">🔒 Admin</button>
+</div>
+
 <!-- HOME -->
 <div id="home" class="page active">
+
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
-<p id="musica">⚫ OFFLINE</p>
-<p id="ouvintes">⚫ OFFLINE</p>
+<p id="musica">⚫️ OFFLINE</p>
+<p id="ouvintes">0 ouvintes</p>
+
+<!-- VU -->
+<div class="vu" id="vu"></div>
 </div>
 
 <div class="grid">
@@ -160,291 +161,190 @@ input[type="range"]{
 <div class="card">🎤 Ao vivo</div>
 <div class="card">🔥 Hits atualizados</div>
 </div>
-
-<!-- VU PRO -->
-<div class="vu" id="vu"></div>
-
-<div class="volume-box">
-🔊 Volume<br>
-<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
-</div>
-
-<div class="volume-box">
-🎚️ Sensibilidade<br>
-<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
-</div>
 </div>
 
 <!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedir Música</h3>
-<input id="inputNome" placeholder="Seu nome">
-<input id="inputMusica" placeholder="Música">
-<input id="inputCantor" placeholder="Cantor">
-<button onclick="enviarPedido()">Enviar</button>
+<input id="nome" placeholder="Seu nome">
+<input id="musicaInput" placeholder="Música">
+<input id="cantor" placeholder="Cantor">
+<button onclick="enviar()">Enviar</button>
 </div>
 
 <!-- ADMIN -->
 <div id="admin" class="page">
-<h3>📋 Admin - Pedidos</h3>
+<h3>📋 Admin</h3>
 <div id="lista"></div>
 </div>
-
-<!-- MENU -->
-<div>
-<button onclick="mostrar('home')">🏠 Home</button>
-<button onclick="mostrar('pedido')">🎵 Pedido</button>
-<button onclick="abrirAdmin()">🔒 Admin</button>
-</div>
-
-<!-- AUDIO -->
-<audio id="audio" crossorigin="anonymous"></audio>
 
 <!-- PLAYER -->
 <div class="player">
 <button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
-<span id="statusPlayer">OFFLINE</span>
-<button onclick="toggleMute()">🔇</button>
+
+<input type="range" min="0" max="1" step="0.01" id="volume">
+
+<span id="statusPlayer">Parado</span>
 </div>
-<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream "></audio>
+
+<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
 <script>
 
-// ================= STREAM =================
+/* ELEMENTOS */
 const audio = document.getElementById("audio");
-
-const streams = [
-"https://heights-blue-hub-remember.trycloudflare.com/stream",
-"https://heights-blue-hub-remember.trycloudflare.com/stream"
-];
-
-let atual = 0;
-
-function carregarStream(){
-    audio.src = streams[atual];
-    audio.load();
-}
-
-audio.onerror = ()=>{
-    atual++;
-    if(atual < streams.length){
-        carregarStream();
-        audio.play();
-    }else{
-        alert("Sem stream disponível");
-    }
-};
-
-// ================= ELEMENTOS =================
 const btn = document.getElementById("btn");
-const statusPlayer = document.getElementById("statusPlayer");
-const statusTopo = document.getElementById("statusTopo");
-const musicaEl = document.getElementById("musica");
-const ouvintesEl = document.getElementById("ouvintes");
-const led = document.getElementById("led1");
+const led = document.getElementById("led");
 
-const volumeSlider = document.getElementById("volume");
-const gainSlider = document.getElementById("gainControl");
-
-let ligado = false;
-
-// ================= AUDIO CONTEXT =================
-let ctx, analyser, source, gainNode, dataArray;
-let iniciado = false;
-
-function initAudio(){
-    if(iniciado) return;
-
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.7;
-
-    gainNode = ctx.createGain();
-    gainNode.gain.value = gainSlider.value;
-
-    source = ctx.createMediaElementSource(audio);
-
-    source.connect(gainNode);
-    gainNode.connect(analyser);
-    analyser.connect(ctx.destination);
-
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    iniciado = true;
+/* MENU */
+function show(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById(p).classList.add("active");
 }
 
-// ================= PLAY =================
-function play(){
+/* STREAM AUDIO + VU */
+let ctx, analyser, source, dataArray;
+let started = false;
 
-    if(!audio.src) carregarStream();
-
-    if(!iniciado) initAudio();
-    if(ctx.state === "suspended") ctx.resume();
-
-    if(audio.paused){
-        audio.play();
-        btn.innerHTML = '<i class="fas fa-pause"></i>';
-        ligado = true;
-
-        statusPlayer.innerText = "🔴 AO VIVO";
-        statusTopo.innerText = "🔴 AO VIVO";
-
-        animateVU();
-    }else{
-        audio.pause();
-        btn.innerHTML = '<i class="fas fa-play"></i>';
-        ligado = false;
-
-        statusPlayer.innerText = "⚫ OFFLINE";
-        statusTopo.innerText = "⚫ OFFLINE";
-    }
-}
-
-// ================= CONTROLES =================
-function toggleMute(){
-    audio.muted = !audio.muted;
-}
-
-volumeSlider.oninput = ()=>{
-    audio.volume = volumeSlider.value;
-};
-
-gainSlider.oninput = ()=>{
-    if(gainNode) gainNode.gain.value = gainSlider.value;
-};
-
-// ================= VU PRO =================
+/* VU */
 const vu = document.getElementById("vu");
 const bars = [];
-const smooth = new Array(50).fill(0);
 
 for(let i=0;i<50;i++){
-    let b = document.createElement("div");
-    b.className = "bar";
-    vu.appendChild(b);
-    bars.push(b);
+let b=document.createElement("div");
+b.className="bar";
+vu.appendChild(b);
+bars.push(b);
 }
 
+/* INIT AUDIO */
+function initAudio(){
+
+if(started) return;
+
+ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+analyser = ctx.createAnalyser();
+analyser.fftSize = 512;
+analyser.smoothingTimeConstant = 0.7;
+
+source = ctx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(ctx.destination);
+
+dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+started = true;
+}
+
+/* PLAY */
+let playing=false;
+
+function play(){
+
+if(audio.paused){
+audio.play();
+
+btn.innerHTML='<i class="fas fa-pause"></i>';
+
+document.getElementById("statusPlayer").innerText="AO VIVO 🔴";
+document.getElementById("statusTopo").innerText="🔴 AO VIVO";
+
+led.style.background="#00ff2a";
+
+initAudio();
+
+if(!window.vuRun){
+window.vuRun=true;
+animateVU();
+}
+
+}else{
+audio.pause();
+
+btn.innerHTML='<i class="fas fa-play"></i>';
+
+document.getElementById("statusPlayer").innerText="Parado";
+document.getElementById("statusTopo").innerText="⚫ OFFLINE";
+
+led.style.background="#444";
+}
+}
+
+/* VU ANIMATION */
 function animateVU(){
-    requestAnimationFrame(animateVU);
+requestAnimationFrame(animateVU);
 
-    if(!analyser) return;
+if(!analyser) return;
 
-    analyser.getByteFrequencyData(dataArray);
+analyser.getByteFrequencyData(dataArray);
 
-    const center = bars.length / 2;
+for(let i=0;i<bars.length;i++){
 
-    for(let i=0;i<bars.length;i++){
+let v=dataArray[i]||0;
+let h=(v/255)*120;
 
-        let v = dataArray[i] || 0;
-        v = Math.pow(v / 255, 1.5) * 180;
+bars[i].style.height=h+"px";
 
-        smooth[i] = smooth[i]*0.6 + v*0.4;
-
-        let h = Math.min(140, smooth[i]);
-        bars[i].style.height = h + "px";
-
-        let dist = Math.abs(i - center);
-        let moveX = dist * (h / 50);
-
-        bars[i].style.transform = i < center
-        ? `translateX(-${moveX}px)`
-        : `translateX(${moveX}px)`;
-
-        bars[i].style.background =
-            h < 50 ? "#00ff00" :
-            h < 90 ? "#ffff00" : "#ff0000";
-
-        bars[i].style.boxShadow = "0 0 8px " + bars[i].style.background;
-    }
+bars[i].style.background=
+h<40?"#00ff2a":
+h<80?"#ffff00":"#ff0000";
+}
 }
 
-// ================= TELAS =================
-function mostrar(p){
-    document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
-    document.getElementById(p).classList.add("active");
+/* VOLUME */
+document.getElementById("volume").oninput=(e)=>{
+audio.volume=e.target.value;
+};
+
+/* PEDIDOS */
+function enviar(){
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+
+pedidos.push({
+nome:nome.value,
+musica:musicaInput.value,
+cantor:cantor.value,
+data:new Date().toLocaleString()
+});
+
+localStorage.setItem("pedidos",JSON.stringify(pedidos));
+
+alert("Pedido enviado!");
 }
 
-// ================= PEDIDOS =================
-function enviarPedido(){
-    let nome = inputNome.value.trim();
-    let musica = inputMusica.value.trim();
-    let cantor = inputCantor.value.trim();
+/* ADMIN */
+function openAdmin(){
+let senha=prompt("Senha:");
+if(senha!=="1234") return;
 
-    if(!nome || !musica || !cantor) return alert("Preencha tudo!");
+show("admin");
 
-    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let lista=document.getElementById("lista");
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
 
-    pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
+lista.innerHTML="";
 
-    localStorage.setItem("pedidos",JSON.stringify(pedidos));
-
-    alert("Pedido enviado!");
-
-    inputNome.value="";
-    inputMusica.value="";
-    inputCantor.value="";
+pedidos.forEach((p,i)=>{
+lista.innerHTML+=`
+<div>
+<b>${p.nome}</b><br>
+${p.musica} - ${p.cantor}<br>
+${p.data}<hr>
+</div>`;
+});
 }
 
-// ================= ADMIN =================
-function abrirAdmin(){
-    let senha = prompt("Senha:");
-    if(senha !== "928374") return alert("Senha incorreta");
-
-    admin.style.display = "block";
-    carregarPedidos();
-}
-
-function carregarPedidos(){
-    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-    lista.innerHTML = "";
-
-    pedidos.forEach((p,i)=>{
-        lista.innerHTML += `
-        <div>
-        <b>${p.nome}</b><br>
-        🎵 ${p.musica}<br>
-        🎤 ${p.cantor}<br>
-        🕒 ${p.data}<br>
-        <button onclick="apagar(${i})">Excluir</button>
-        </div><hr>`;
-    });
-}
-
-function apagar(i){
-    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-    pedidos.splice(i,1);
-    localStorage.setItem("pedidos",JSON.stringify(pedidos));
-    carregarPedidos();
-}
-
-// ================= RELÓGIO =================
+/* SIMULAÇÕES */
 setInterval(()=>{
-    time.innerText = new Date().toLocaleTimeString();
-    date.innerText = new Date().toLocaleDateString();
-},1000);
-
-// ================= LED =================
-setInterval(()=>{
-    if(!ligado){
-        led.style.background="#444";
-        return;
-    }
-    led.style.background = led.style.background=="lime" ? "#444" : "lime";
-},1000);
-
-// ================= SIMULAÇÕES =================
-setInterval(()=>{
-    if(!ligado) return;
-    musicaEl.innerText = "🎵 Música " + Math.floor(Math.random()*100);
-},4000);
-
-setInterval(()=>{
-    if(!ligado) return;
-    ouvintesEl.innerText = Math.floor(Math.random()*200) + " ouvintes";
+document.getElementById("ouvintes").innerText=
+"🟡 Ouvintes: "+Math.floor(Math.random()*200);
 },3000);
+
+setInterval(()=>{
+document.getElementById("musica").innerText=
+"🟢 Tocando: Música "+Math.floor(Math.random()*100);
+},5000);
 
 </script>
 
