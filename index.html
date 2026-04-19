@@ -54,6 +54,7 @@ input[type="range"]{width:80%;}
 </div>
 </header>
 
+<!-- HOME -->
 <div id="home" class="page active">
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
@@ -68,12 +69,14 @@ input[type="range"]{width:80%;}
 </div>
 </div>
 
+<!-- MENU -->
 <div>
 <button onclick="mostrar('home')">🏠 Home</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
+<!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
 
@@ -84,17 +87,21 @@ input[type="range"]{width:80%;}
 <button onclick="enviarPedido()">Enviar Pedido</button>
 </div>
 
+<!-- ADMIN -->
 <div id="admin" style="display:none">
 <h3>📋 Pedidos</h3>
 <div id="lista"></div>
 </div>
 
+<!-- PLAYER -->
 <div class="player">
 <button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
+<!-- 🔥 ÚNICO AUDIO -->
+<audio id="audio" crossorigin="anonymous"
+src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
 <button onclick="toggleMute()">🔇 Mudo</button>
 
@@ -111,7 +118,10 @@ input[type="range"]{width:80%;}
 <div class="vu" id="vu"></div>
 
 <script>
+// ===== ELEMENTOS =====
 const audio = document.getElementById("audio");
+audio.crossOrigin = "anonymous";
+
 const btn = document.getElementById("btn");
 const statusPlayer = document.getElementById("statusPlayer");
 const statusTopo = document.getElementById("statusTopo");
@@ -124,10 +134,15 @@ const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
-// PLAYER
+// ===== PLAYER =====
 function play(){
 
 if(!ctx) initAudio();
+
+// 🔓 desbloqueia áudio no navegador
+if(ctx && ctx.state === "suspended"){
+    ctx.resume();
+}
 
 if(audio.paused){
 audio.play().catch(()=>alert("Clique novamente"));
@@ -150,21 +165,21 @@ statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// MUTE
+// ===== MUTE =====
 function toggleMute(){
 audio.muted=!audio.muted;
 }
 
-// VOLUME
+// ===== VOLUME =====
 volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
 
-// TELAS
+// ===== TELAS =====
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// PEDIDOS
+// ===== PEDIDOS =====
 function enviarPedido(){
 let nome=document.getElementById("inputNome").value.trim();
 let musica=document.getElementById("inputMusica").value.trim();
@@ -184,7 +199,7 @@ document.getElementById("inputMusica").value="";
 document.getElementById("inputCantor").value="";
 }
 
-// ADMIN
+// ===== ADMIN =====
 function abrirAdmin(){
 let senha=prompt("Senha:");
 if(senha!=="928374") return alert("Errada");
@@ -218,19 +233,19 @@ localStorage.setItem("pedidos",JSON.stringify(pedidos));
 carregarPedidos();
 }
 
-// RELÓGIO
+// ===== RELÓGIO =====
 setInterval(()=>{
 document.getElementById("time").innerText=new Date().toLocaleTimeString();
 document.getElementById("date").innerText=new Date().toLocaleDateString();
 },1000);
 
-// LED
+// ===== LED =====
 setInterval(()=>{
 if(!ligado){led.style.background="#444";return;}
 led.style.background=led.style.background=="lime"?"#444":"lime";
 },1000);
 
-// SIMULAÇÃO
+// ===== SIMULAÇÃO =====
 setInterval(()=>{
 if(!ligado) return;
 musicaEl.innerText="🎵 Tocando: Música "+Math.floor(Math.random()*100);
@@ -241,7 +256,7 @@ if(!ligado) return;
 ouvintesEl.innerText=Math.floor(Math.random()*200)+" ouvintes";
 },3000);
 
-// VU
+// ===== VU =====
 const vu=document.getElementById("vu");
 const bars=[];
 
