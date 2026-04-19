@@ -15,7 +15,6 @@ header h1{color:#1db954;font-size:16px;}
 
 .status-top{display:flex;align-items:center;gap:10px;}
 
-/* 🔥 LED ERICSSON */
 #led1{
 width:10px;
 height:10px;
@@ -50,8 +49,10 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <h1>Rádio Palavra Viva-WEB</h1>
 
 <div class="status-top">
-<div id="led1"></div>
-  <div id="led2"></div>
+<d<div id="led1"></div>
+  
+<d<div id="led2"></div>
+  
 
 <div class="clock">
 <div id="time">00:00:00</div>
@@ -76,15 +77,38 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <div class="card">🔄 Atualize se parar</div>
 </div>
 </div>
+  
+  </head>
+
+<body>
+
+
 
 <!-- MENU -->
 <div style="text-align:center;">
-  <button onclick="mostrar('home')">🏠 Início</button>
+<button onclick="mostrar('home')">🏠 Home</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
 <!-- PEDIDO -->
+<div id="pedido" class="page">
+<h3 style="text-align:center;">🎵 Pedido</h3>
+
+<div class="form-box">
+<input id="nome" placeholder="Seu nome">
+<input id="musicaInput" placeholder="Música">
+<input id="cantor" placeholder="Cantor">
+
+<button onclick="enviarPedido()">Enviar Pedido</button>
+</div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="admin">
+<h3>📋 Pedidos Recebidos</h3>
+<div id="lista"></div>
+</div>
 
 <!-- PLAYER -->
 <div class="player">
@@ -92,7 +116,8 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<audio id="audio" src="https://stream.zeno.fm/0r0xa792kwzuv""></audio>
+<!-- FIX AUDIO -->
+<audio id="audio" src="https://stream.zeno.fm/0r0xa792kwzuv"></audio>
 
 <script>
 
@@ -102,7 +127,7 @@ document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// ENVIAR PEDIDO
+// PEDIDOS (LOCALSTORAGE)
 function enviarPedido(){
 
 let nome = document.getElementById("nome").value.trim();
@@ -220,11 +245,11 @@ musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+" 🟡 " Ouvintes";
+ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
 },3000);
 
-/* 🔥 LED SUAVE ERICSSON */
-let ledOn = false;
+// LED
+let ledOn=false;
 
 setInterval(()=>{
 
@@ -234,7 +259,7 @@ led1.style.boxShadow="0 0 0px lime";
 return;
 }
 
-ledOn = !ledOn;
+ledOn=!ledOn;
 
 if(ledOn){
 led1.style.background="lime";
@@ -245,6 +270,23 @@ led1.style.boxShadow="0 0 0px lime";
 }
 
 },1500);
+  let radioLigado = false;
+
+// FUNÇÃO PRINCIPAL
+function toggleRadio() {
+    radioLigado = !radioLigado;
+
+    const led = document.getElementById("led");
+    const status = document.getElementById("status");
+
+    if (radioLigado) {
+        led.classList.add("on");
+        status.innerText = "Ligado ao vivo 🔴";
+    } else {
+        led.classList.remove("on");
+        status.innerText = "Desligado ⚫";
+    }
+}
 
 </script>
 
