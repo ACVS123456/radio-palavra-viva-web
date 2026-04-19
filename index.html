@@ -39,6 +39,62 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 .admin{display:none;}
 .form-box{max-width:300px;margin:20px auto;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
+body{
+    margin:0;
+    font-family:'Segoe UI';
+    background:#0d1117;
+    color:white;
+    text-align:center;
+}
+
+header{
+    background:#161b22;
+    padding:15px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.container{
+    padding:20px;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    background:#00ff88;
+    color:black;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
+    margin:5px;
+}
+
+.volume-box{
+    margin-top:15px;
+}
+
+input[type="range"]{
+    width:80%;
+}
+
+/* VU */
+.vu{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    gap:2px;
+    margin-top:40px;
+    height:140px;
+}
+
+.bar{
+    width:6px;
+    height:10px;
+    border-radius:3px;
+    transform-origin:bottom;
+    transition:0.05s;
+}
+  
 </style>
 
 </head>
@@ -119,8 +175,55 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <!-- FIX AUDIO -->
 <audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
-<script>
+  <button onclick="toggleMute()">🔇 Mudo</button>
 
+<audio id="audio" crossorigin="anonymous"
+src="https://heights-blue-hub-remember.trycloudflare.com/stream">
+</audio>
+
+<div class="volume-box">
+🔊 Volume:
+<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
+</div>
+
+<div class="volume-box">
+🎚️ Sensibilidade:
+<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
+</div>
+
+<div class="vu" id="vu"></div>
+
+</div>
+
+<script>
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("playBtn");
+const volumeSlider = document.getElementById("volume");
+const gainSlider = document.getElementById("gainControl");
+
+// ===== VOLUME =====
+volumeSlider.oninput = function(){
+    audio.volume = this.value;
+    localStorage.setItem("volumeRadio", this.value);
+};
+
+window.onload = ()=>{
+    let vol = localStorage.getItem("volumeRadio");
+    if(vol){
+        audio.volume = vol;
+        volumeSlider.value = vol;
+    }
+
+    let savedGain = localStorage.getItem("gainRadio");
+    if(savedGain){
+        gainSlider.value = savedGain;
+    }
+};
+
+// ===== MUTE =====
+function toggleMute(){
+    audio.muted = !audio.muted;
+  }
 // TROCA DE TELA
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
@@ -287,6 +390,96 @@ function toggleRadio() {
         status.innerText = "Desligado ⚫";
     }
 }
+  // ===== VU =====
+const vu = document.getElementById("vu");
+const bars = [];
+
+for(let i=0;i<50;i++){
+    let bar = document.createElement("div");
+    bar.classList.add("bar");
+    vu.appendChild(bar);
+    bars.push(bar);
+}
+
+let ctx, analyser, source, dataArray, gainNode;
+let smooth = new Array(50).fill(0);
+
+function initAudio(){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.7;
+
+    gainNode = ctx.createGain();
+    gainNode.gain.value = gainSlider.value;
+
+    source = ctx.createMediaElementSource(audio);
+
+    source.connect(gainNode);
+    gainNode.connect(analyser);
+    analyser.connect(ctx.destination);
+
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
+
+// CONTROLE DE SENSIBILIDADE
+gainSlider.oninput = function(){
+    if(gainNode){
+        gainNode.gain.value = this.value;
+    }
+    localStorage.setItem("gainRadio", this.value);
+};
+
+// ANIMAÇÃO
+function animateVU(){
+    requestAnimationFrame(animateVU);
+
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(dataArray);
+
+    const center = bars.length / 2;
+
+    for(let i=0;i<bars.length;i++){
+
+        let value = dataArray[i] || 0;
+
+        // CURVA NATURAL
+        value = Math.pow(value / 255, 1.5) * 180;
+
+        smooth[i] = smooth[i] * 0.6 + value * 0.4;
+
+        let height = smooth[i];
+        if(height > 140) height = 140;
+
+        bars[i].style.height = height + "px";
+
+        // MOVIMENTO LATERAL
+        let distance = Math.abs(i - center);
+        let moveX = distance * (height / 50);
+
+        if(i < center){
+            bars[i].style.transform = `translateX(-${moveX}px)`;
+        }else{
+            bars[i].style.transform = `translateX(${moveX}px)`;
+        }
+
+        // 🌈 CORES NÍTIDAS EM ETAPAS
+        if(height < 50){
+            bars[i].style.background = "#00ff00";
+        }
+        else if(height < 90){
+            bars[i].style.background = "#ffff00";
+        }
+        else{
+            bars[i].style.background = "#ff0000";
+        }
+
+        // 💡 EFEITO BRILHO
+        bars[i].style.boxShadow = "0 0 8px " + bars[i].style.background;
+    }
+    }
 
 </script>
 
