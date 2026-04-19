@@ -38,6 +38,14 @@ header h1{color:#1db954;font-size:16px;}
     background:#444;
 }
 
+/* RELÓGIO */
+.clock{
+    text-align:center;
+    font-size:12px;
+    line-height:14px;
+    margin-left:10px;
+}
+
 /* PAGES */
 .page{display:none;padding:15px;}
 .active{display:block;}
@@ -125,6 +133,13 @@ input{
     border-radius:3px;
 }
 
+/* AVISOS */
+.aviso{
+    margin-top:10px;
+    font-size:12px;
+    opacity:0.8;
+}
+
 </style>
 </head>
 
@@ -132,8 +147,16 @@ input{
 
 <header>
 <h1>🌐Rádio Palavra Viva WEB</h1>
+
 <div class="status-top">
 <div id="led"></div>
+
+<!-- 🔥 RELÓGIO RESTAURADO -->
+<div class="clock">
+<div id="time">00:00:00</div>
+<div id="date">--/--/----</div>
+</div>
+
 </div>
 </header>
 
@@ -154,10 +177,18 @@ input{
 
 <!-- VU -->
 <div class="vu" id="vu"></div>
+
+<!-- 🔥 AVISOS RESTAURADOS -->
+<div class="aviso">
+▶️ Clique em play para iniciar o áudio<br>
+🔄 Se parar, recarregue a página<br>
+📶 Aguarde conexão com stream
+</div>
+
 </div>
 
 <div class="grid">
-<div class="card">📻 24h no ar</div>
+<div class="card">🕒 24h no ar</div>
 <div class="card">🎤 Ao vivo</div>
 <div class="card">🔥 Hits atualizados</div>
 </div>
@@ -202,11 +233,23 @@ document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-/* STREAM AUDIO + VU */
+/* RELÓGIO RESTAURADO */
+function clock(){
+const now = new Date();
+
+document.getElementById("time").innerText =
+now.toLocaleTimeString();
+
+document.getElementById("date").innerText =
+now.toLocaleDateString();
+}
+setInterval(clock,1000);
+clock();
+
+/* AUDIO + VU */
 let ctx, analyser, source, dataArray;
 let started = false;
 
-/* VU */
 const vu = document.getElementById("vu");
 const bars = [];
 
@@ -217,7 +260,6 @@ vu.appendChild(b);
 bars.push(b);
 }
 
-/* INIT AUDIO */
 function initAudio(){
 
 if(started) return;
@@ -238,11 +280,10 @@ started = true;
 }
 
 /* PLAY */
-let playing=false;
-
 function play(){
 
 if(audio.paused){
+
 audio.play();
 
 btn.innerHTML='<i class="fas fa-pause"></i>';
@@ -260,6 +301,7 @@ animateVU();
 }
 
 }else{
+
 audio.pause();
 
 btn.innerHTML='<i class="fas fa-play"></i>';
@@ -271,7 +313,7 @@ led.style.background="#444";
 }
 }
 
-/* VU ANIMATION */
+/* VU */
 function animateVU(){
 requestAnimationFrame(animateVU);
 
@@ -316,7 +358,7 @@ alert("Pedido enviado!");
 /* ADMIN */
 function openAdmin(){
 let senha=prompt("Senha:");
-if(senha!=="1234") return;
+if(senha!=="928374") return;
 
 show("admin");
 
