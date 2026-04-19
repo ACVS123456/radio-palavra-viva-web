@@ -3,53 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rádio Palavra Viva - WEB</title>
+<title>Rádio Palavra Viva - WEB PRO</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;text-align:center;}
+body{
+    margin:0;
+    font-family:'Segoe UI';
+    background:#0d1117;
+    color:white;
+    text-align:center;
+    padding-bottom:90px;
+}
 
-header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
-header h1{color:#1db954;font-size:16px;}
+/* HEADER */
+header{
+    background:#161b22;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    flex-wrap:wrap;
+}
 
-.status-top{display:flex;align-items:center;gap:10px;}
+header h1{
+    color:#1db954;
+    font-size:16px;
+}
 
-#led1{width:10px;height:10px;border-radius:50%;background:#444;transition:0.5s;}
+/* STATUS */
+.status-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
 
-.clock{text-align:center;}
+#led1{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#444;
+}
+
+/* PÁGINAS */
 .page{display:none;padding:15px;}
 .active{display:block;}
 
-.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;}
-.card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
+/* CARDS */
+.banner{
+    background:linear-gradient(135deg,#1db954,#000);
+    padding:25px;
+    border-radius:10px;
+}
 
-.player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
+.card{
+    background:#161b22;
+    padding:10px;
+    border-radius:10px;
+    font-size:14px;
+}
 
-button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;cursor:pointer;margin:5px;}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-top:10px;
+}
 
-input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
+/* BOTÕES */
+button{
+    background:#1db954;
+    border:none;
+    padding:8px 12px;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+    margin:5px;
+}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
+/* INPUT */
+input{
+    padding:8px;
+    border-radius:5px;
+    border:none;
+    width:90%;
+    margin:5px 0;
+}
 
-.volume-box{margin-top:10px;}
-input[type="range"]{width:120px;}
-.player input[type="range"]{width:90px;}
+/* PLAYER FIXO */
+.player{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#161b22;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:10px;
+}
 
-.vu{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:20px;height:140px;}
-.bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;transition:0.05s;}
+/* VOLUME */
+.volume-box{
+    margin-top:10px;
+}
+
+input[type="range"]{
+    width:80%;
+}
+
+/* VU METER PRO */
+.vu{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    gap:2px;
+    margin-top:25px;
+    height:140px;
+}
+
+.bar{
+    width:6px;
+    height:10px;
+    border-radius:3px;
+    transform-origin:bottom;
+    transition:0.05s;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>Rádio Palavra Viva-WEB</h1>
+<h1>📻 Rádio Palavra Viva WEB PRO</h1>
 
 <div class="status-top">
 <div id="led1"></div>
-
-<div class="clock">
+<div>
 <div id="time"></div>
 <div id="date"></div>
 </div>
@@ -66,80 +157,61 @@ input[type="range"]{width:120px;}
 
 <div class="grid">
 <div class="card">📻 24h no ar</div>
-<div class="card">🎤 Programas ao vivo</div>
+<div class="card">🎤 Ao vivo</div>
 <div class="card">🔥 Hits atualizados</div>
-<div class="card">▶️ Aguarde 10s após clicar</div>
-<div class="card">🔄 Atualize se parar</div>
 </div>
+
+<!-- VU PRO -->
+<div class="vu" id="vu"></div>
+
+<div class="volume-box">
+🔊 Volume<br>
+<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
+</div>
+
+<div class="volume-box">
+🎚️ Sensibilidade<br>
+<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
+</div>
+</div>
+
+<!-- PEDIDO -->
+<div id="pedido" class="page">
+<h3>🎵 Pedir Música</h3>
+<input id="inputNome" placeholder="Seu nome">
+<input id="inputMusica" placeholder="Música">
+<input id="inputCantor" placeholder="Cantor">
+<button onclick="enviarPedido()">Enviar</button>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="page">
+<h3>📋 Admin - Pedidos</h3>
+<div id="lista"></div>
 </div>
 
 <!-- MENU -->
 <div>
 <button onclick="mostrar('home')">🏠 Home</button>
-<button onclick="mostrar('pedido')">🎵 Pedir Música</button>
+<button onclick="mostrar('pedido')">🎵 Pedido</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
-<!-- PEDIDO -->
-<div id="pedido" class="page">
-<h3>🎵 Pedido</h3>
-
-<input id="nome" placeholder="Seu nome">
-<input id="musicaInput" placeholder="Música">
-<input id="cantor" placeholder="Cantor">
-
-<button onclick="enviarPedido()">Enviar Pedido</button>
-</div>
-
-<!-- ADMIN -->
-<div id="admin" style="display:none">
-<h3>📋 Pedidos Recebidos</h3>
-<div id="lista"></div>
-</div>
+<!-- AUDIO -->
+<audio id="audio" crossorigin="anonymous"></audio>
 
 <!-- PLAYER -->
 <div class="player">
 <button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
-<input type="range" min="0" max="1" step="0.01" onchange="audio.volume=this.value">
 <span id="statusPlayer">OFFLINE</span>
+<button onclick="toggleMute()">🔇</button>
 </div>
-
-<audio id="audio"></audio>
-
-<button onclick="toggleMute()">🔇 Mudo</button>
-
-<div class="volume-box">
-🔊 Volume
-<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
-</div>
-
-<div class="volume-box">
-🎚️ Sensibilidade
-<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
-</div>
-
-<div class="vu" id="vu"></div>
 
 <script>
 
-// ===== ELEMENTOS FIXADOS (CORREÇÃO PRINCIPAL) =====
+// ================= STREAM =================
 const audio = document.getElementById("audio");
-const btn = document.getElementById("btn");
-const volumeSlider = document.getElementById("volume");
-const gainSlider = document.getElementById("gainControl");
 
-const statusPlayer = document.getElementById("statusPlayer");
-const statusTopo = document.getElementById("statusTopo");
-
-const led1 = document.getElementById("led1");
-
-const time = document.getElementById("time");
-const date = document.getElementById("date");
-
-const musica = document.getElementById("musica");
-const ouvintes = document.getElementById("ouvintes");
-
-// STREAM
 const streams = [
 "https://heights-blue-hub-remember.trycloudflare.com/stream",
 "https://stream.zeno.fm/0r0xa792kwzuv"
@@ -148,199 +220,230 @@ const streams = [
 let atual = 0;
 
 function carregarStream(){
-audio.src = streams[atual];
-audio.load();
+    audio.src = streams[atual];
+    audio.load();
 }
 
 audio.onerror = ()=>{
-atual++;
-if(atual < streams.length){
-carregarStream();
-audio.play();
-}
+    atual++;
+    if(atual < streams.length){
+        carregarStream();
+        audio.play();
+    }else{
+        alert("Sem stream disponível");
+    }
 };
 
-// ===== AUDIO CONTEXT =====
-let ctx, analyser, dataArray, source, gainNode;
-let iniciado = false;
+// ================= ELEMENTOS =================
+const btn = document.getElementById("btn");
+const statusPlayer = document.getElementById("statusPlayer");
+const statusTopo = document.getElementById("statusTopo");
+const musicaEl = document.getElementById("musica");
+const ouvintesEl = document.getElementById("ouvintes");
+const led = document.getElementById("led1");
+
+const volumeSlider = document.getElementById("volume");
+const gainSlider = document.getElementById("gainControl");
+
 let ligado = false;
 
+// ================= AUDIO CONTEXT =================
+let ctx, analyser, source, gainNode, dataArray;
+let iniciado = false;
+
 function initAudio(){
-if(iniciado) return;
+    if(iniciado) return;
 
-ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-analyser = ctx.createAnalyser();
-analyser.fftSize = 512;
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.7;
 
-gainNode = ctx.createGain();
-gainNode.gain.value = gainSlider.value;
+    gainNode = ctx.createGain();
+    gainNode.gain.value = gainSlider.value;
 
-source = ctx.createMediaElementSource(audio);
+    source = ctx.createMediaElementSource(audio);
 
-source.connect(gainNode);
-gainNode.connect(analyser);
-analyser.connect(ctx.destination);
+    source.connect(gainNode);
+    gainNode.connect(analyser);
+    analyser.connect(ctx.destination);
 
-dataArray = new Uint8Array(analyser.frequencyBinCount);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-iniciado = true;
+    iniciado = true;
 }
 
-// ===== PLAY =====
+// ================= PLAY =================
 function play(){
 
-if(!audio.src) carregarStream();
-if(!iniciado) initAudio();
-if(ctx.state === "suspended") ctx.resume();
+    if(!audio.src) carregarStream();
 
-if(audio.paused){
+    if(!iniciado) initAudio();
+    if(ctx.state === "suspended") ctx.resume();
 
-audio.play().then(()=>{
-btn.innerHTML='<i class="fas fa-pause"></i>';
-ligado = true;
+    if(audio.paused){
+        audio.play();
+        btn.innerHTML = '<i class="fas fa-pause"></i>';
+        ligado = true;
 
-statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
+        statusPlayer.innerText = "🔴 AO VIVO";
+        statusTopo.innerText = "🔴 AO VIVO";
 
-animateVU();
+        animateVU();
+    }else{
+        audio.pause();
+        btn.innerHTML = '<i class="fas fa-play"></i>';
+        ligado = false;
 
-}).catch(()=>{
-alert("Clique novamente para liberar áudio");
-});
-
-}else{
-
-audio.pause();
-btn.innerHTML='<i class="fas fa-play"></i>';
-ligado = false;
-
-statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
-}
+        statusPlayer.innerText = "⚫ OFFLINE";
+        statusTopo.innerText = "⚫ OFFLINE";
+    }
 }
 
-// CONTROLES
-function toggleMute(){audio.muted=!audio.muted;}
-volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
+// ================= CONTROLES =================
+function toggleMute(){
+    audio.muted = !audio.muted;
+}
 
-gainSlider.oninput=()=>{
-if(gainNode) gainNode.gain.value=gainSlider.value;
+volumeSlider.oninput = ()=>{
+    audio.volume = volumeSlider.value;
 };
 
-// MENU
+gainSlider.oninput = ()=>{
+    if(gainNode) gainNode.gain.value = gainSlider.value;
+};
+
+// ================= VU PRO =================
+const vu = document.getElementById("vu");
+const bars = [];
+const smooth = new Array(50).fill(0);
+
+for(let i=0;i<50;i++){
+    let b = document.createElement("div");
+    b.className = "bar";
+    vu.appendChild(b);
+    bars.push(b);
+}
+
+function animateVU(){
+    requestAnimationFrame(animateVU);
+
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(dataArray);
+
+    const center = bars.length / 2;
+
+    for(let i=0;i<bars.length;i++){
+
+        let v = dataArray[i] || 0;
+        v = Math.pow(v / 255, 1.5) * 180;
+
+        smooth[i] = smooth[i]*0.6 + v*0.4;
+
+        let h = Math.min(140, smooth[i]);
+        bars[i].style.height = h + "px";
+
+        let dist = Math.abs(i - center);
+        let moveX = dist * (h / 50);
+
+        bars[i].style.transform = i < center
+        ? `translateX(-${moveX}px)`
+        : `translateX(${moveX}px)`;
+
+        bars[i].style.background =
+            h < 50 ? "#00ff00" :
+            h < 90 ? "#ffff00" : "#ff0000";
+
+        bars[i].style.boxShadow = "0 0 8px " + bars[i].style.background;
+    }
+}
+
+// ================= TELAS =================
 function mostrar(p){
-document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
-document.getElementById(p).classList.add("active");
+    document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+    document.getElementById(p).classList.add("active");
 }
 
-// PEDIDOS
+// ================= PEDIDOS =================
 function enviarPedido(){
-let nomeVal = document.getElementById("nome").value.trim();
-let musicaVal = document.getElementById("musicaInput").value.trim();
-let cantorVal = document.getElementById("cantor").value.trim();
+    let nome = inputNome.value.trim();
+    let musica = inputMusica.value.trim();
+    let cantor = inputCantor.value.trim();
 
-if(!nomeVal||!musicaVal||!cantorVal) return alert("Preencha tudo!");
+    if(!nome || !musica || !cantor) return alert("Preencha tudo!");
 
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
-pedidos.push({nome:nomeVal,musica:musicaVal,cantor:cantorVal,data:new Date().toLocaleString()});
-localStorage.setItem("pedidos",JSON.stringify(pedidos));
+    pedidos.push({nome,musica,cantor,data:new Date().toLocaleString()});
 
-alert("Pedido enviado!");
+    localStorage.setItem("pedidos",JSON.stringify(pedidos));
+
+    alert("Pedido enviado!");
+
+    inputNome.value="";
+    inputMusica.value="";
+    inputCantor.value="";
 }
 
-// ADMIN
+// ================= ADMIN =================
 function abrirAdmin(){
-let senha=prompt("Digite a senha:");
-if(senha!=="928374") return alert("Senha errada!");
+    let senha = prompt("Senha:");
+    if(senha !== "928374") return alert("Senha incorreta");
 
-document.getElementById("admin").style.display="block";
-carregarPedidos();
+    admin.style.display = "block";
+    carregarPedidos();
 }
 
 function carregarPedidos(){
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-let lista=document.getElementById("lista");
+    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+    lista.innerHTML = "";
 
-lista.innerHTML="";
-
-pedidos.forEach((p,i)=>{
-lista.innerHTML+=`
-<div>
-<b>${p.nome}</b><br>
-🎵 ${p.musica}<br>
-🎤 ${p.cantor}<br>
-🕒 ${p.data}<br>
-<button onclick="apagar(${i})">Excluir</button>
-</div><hr>`;
-});
+    pedidos.forEach((p,i)=>{
+        lista.innerHTML += `
+        <div>
+        <b>${p.nome}</b><br>
+        🎵 ${p.musica}<br>
+        🎤 ${p.cantor}<br>
+        🕒 ${p.data}<br>
+        <button onclick="apagar(${i})">Excluir</button>
+        </div><hr>`;
+    });
 }
 
 function apagar(i){
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-pedidos.splice(i,1);
-localStorage.setItem("pedidos",JSON.stringify(pedidos));
-carregarPedidos();
+    let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+    pedidos.splice(i,1);
+    localStorage.setItem("pedidos",JSON.stringify(pedidos));
+    carregarPedidos();
 }
 
-// RELÓGIO (CORRIGIDO)
+// ================= RELÓGIO =================
 setInterval(()=>{
-time.innerText=new Date().toLocaleTimeString();
-date.innerText=new Date().toLocaleDateString();
+    time.innerText = new Date().toLocaleTimeString();
+    date.innerText = new Date().toLocaleDateString();
 },1000);
 
-// LED
+// ================= LED =================
 setInterval(()=>{
-if(!ligado){led1.style.background="#444";return;}
-led1.style.background=led1.style.background=="lime"?"#444":"lime";
+    if(!ligado){
+        led.style.background="#444";
+        return;
+    }
+    led.style.background = led.style.background=="lime" ? "#444" : "lime";
 },1000);
 
-// SIMULAÇÃO
+// ================= SIMULAÇÕES =================
 setInterval(()=>{
-if(!ligado) return;
-musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
+    if(!ligado) return;
+    musicaEl.innerText = "🎵 Música " + Math.floor(Math.random()*100);
 },4000);
 
 setInterval(()=>{
-if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+" 🟡 Ouvintes";
+    if(!ligado) return;
+    ouvintesEl.innerText = Math.floor(Math.random()*200) + " ouvintes";
 },3000);
-
-// VU
-const vu=document.getElementById("vu");
-const bars=[];
-
-for(let i=0;i<50;i++){
-let b=document.createElement("div");
-b.classList.add("bar");
-vu.appendChild(b);
-bars.push(b);
-}
-
-let smooth=new Array(50).fill(0);
-
-function animateVU(){
-requestAnimationFrame(animateVU);
-
-if(!analyser) return;
-
-analyser.getByteFrequencyData(dataArray);
-
-for(let i=0;i<bars.length;i++){
-let v=(dataArray[i]/255)*160;
-
-smooth[i]=smooth[i]*0.7 + v*0.3;
-
-let h=Math.min(smooth[i],140);
-
-bars[i].style.height=h+"px";
-
-bars[i].style.background =
-h<50?"#00ff66":
-h<90?"#ffcc00":"#ff3300";
-}
-}
 
 </script>
 
