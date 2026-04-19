@@ -36,7 +36,6 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 input[type="range"]{width:120px;}
 .player input[type="range"]{width:90px;}
 
-/* VU */
 .vu{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:20px;height:140px;}
 .bar{width:6px;height:10px;border-radius:3px;transform-origin:bottom;transition:0.05s;}
 </style>
@@ -122,9 +121,25 @@ input[type="range"]{width:120px;}
 <div class="vu" id="vu"></div>
 
 <script>
-// ===== STREAM =====
-const audio = document.getElementById("audio");
 
+// ===== ELEMENTOS FIXADOS (CORREÇÃO PRINCIPAL) =====
+const audio = document.getElementById("audio");
+const btn = document.getElementById("btn");
+const volumeSlider = document.getElementById("volume");
+const gainSlider = document.getElementById("gainControl");
+
+const statusPlayer = document.getElementById("statusPlayer");
+const statusTopo = document.getElementById("statusTopo");
+
+const led1 = document.getElementById("led1");
+
+const time = document.getElementById("time");
+const date = document.getElementById("date");
+
+const musica = document.getElementById("musica");
+const ouvintes = document.getElementById("ouvintes");
+
+// STREAM
 const streams = [
 "https://heights-blue-hub-remember.trycloudflare.com/stream",
 "https://stream.zeno.fm/0r0xa792kwzuv"
@@ -145,16 +160,10 @@ audio.play();
 }
 };
 
-// ===== ELEMENTOS =====
-const btn = document.getElementById("btn");
-const volumeSlider = document.getElementById("volume");
-const gainSlider = document.getElementById("gainControl");
-
-let ligado = false;
-
 // ===== AUDIO CONTEXT =====
 let ctx, analyser, dataArray, source, gainNode;
 let iniciado = false;
+let ligado = false;
 
 function initAudio(){
 if(iniciado) return;
@@ -182,9 +191,7 @@ iniciado = true;
 function play(){
 
 if(!audio.src) carregarStream();
-
 if(!iniciado) initAudio();
-
 if(ctx.state === "suspended") ctx.resume();
 
 if(audio.paused){
@@ -213,7 +220,7 @@ statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// ===== CONTROLES =====
+// CONTROLES
 function toggleMute(){audio.muted=!audio.muted;}
 volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
 
@@ -221,13 +228,13 @@ gainSlider.oninput=()=>{
 if(gainNode) gainNode.gain.value=gainSlider.value;
 };
 
-// ===== TELAS =====
+// MENU
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// ===== PEDIDOS =====
+// PEDIDOS
 function enviarPedido(){
 let nomeVal = document.getElementById("nome").value.trim();
 let musicaVal = document.getElementById("musicaInput").value.trim();
@@ -241,13 +248,9 @@ pedidos.push({nome:nomeVal,musica:musicaVal,cantor:cantorVal,data:new Date().toL
 localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
 alert("Pedido enviado!");
-
-document.getElementById("nome").value="";
-document.getElementById("musicaInput").value="";
-document.getElementById("cantor").value="";
 }
 
-// ===== ADMIN =====
+// ADMIN
 function abrirAdmin(){
 let senha=prompt("Digite a senha:");
 if(senha!=="928374") return alert("Senha errada!");
@@ -281,19 +284,19 @@ localStorage.setItem("pedidos",JSON.stringify(pedidos));
 carregarPedidos();
 }
 
-// ===== RELÓGIO =====
+// RELÓGIO (CORRIGIDO)
 setInterval(()=>{
 time.innerText=new Date().toLocaleTimeString();
 date.innerText=new Date().toLocaleDateString();
 },1000);
 
-// ===== LED =====
+// LED
 setInterval(()=>{
 if(!ligado){led1.style.background="#444";return;}
 led1.style.background=led1.style.background=="lime"?"#444":"lime";
 },1000);
 
-// ===== SIMULAÇÃO =====
+// SIMULAÇÃO
 setInterval(()=>{
 if(!ligado) return;
 musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
@@ -304,7 +307,7 @@ if(!ligado) return;
 ouvintes.innerText=Math.floor(Math.random()*200)+" 🟡 Ouvintes";
 },3000);
 
-// ===== VU =====
+// VU
 const vu=document.getElementById("vu");
 const bars=[];
 
@@ -325,7 +328,6 @@ if(!analyser) return;
 analyser.getByteFrequencyData(dataArray);
 
 for(let i=0;i<bars.length;i++){
-
 let v=(dataArray[i]/255)*160;
 
 smooth[i]=smooth[i]*0.7 + v*0.3;
@@ -334,11 +336,12 @@ let h=Math.min(smooth[i],140);
 
 bars[i].style.height=h+"px";
 
-if(h<50) bars[i].style.background="#00ff66";
-else if(h<90) bars[i].style.background="#ffcc00";
-else bars[i].style.background="#ff3300";
+bars[i].style.background =
+h<50?"#00ff66":
+h<90?"#ffcc00":"#ff3300";
 }
 }
+
 </script>
 
 </body>
