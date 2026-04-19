@@ -40,10 +40,26 @@ header h1{color:#1db954;font-size:16px;}
 
 /* RELÓGIO */
 .clock{
-    text-align:center;
     font-size:12px;
+    text-align:center;
     line-height:14px;
-    margin-left:10px;
+}
+
+/* MENU */
+.menu{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:10px 0;
+}
+
+button{
+    background:#1db954;
+    border:none;
+    padding:8px 10px;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
 }
 
 /* PAGES */
@@ -73,21 +89,13 @@ header h1{color:#1db954;font-size:16px;}
     font-size:14px;
 }
 
-/* BOTÕES MENU */
-.menu{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    margin:10px 0;
-}
-
-button{
-    background:#1db954;
-    border:none;
-    padding:8px 10px;
-    color:white;
+/* INPUT */
+input{
+    padding:8px;
     border-radius:5px;
-    cursor:pointer;
+    border:none;
+    width:100%;
+    margin:5px 0;
 }
 
 /* PLAYER */
@@ -100,6 +108,7 @@ button{
     align-items:center;
     gap:10px;
     padding:10px;
+    z-index:999;
 }
 
 /* VOLUME */
@@ -107,16 +116,7 @@ button{
     width:120px;
 }
 
-/* INPUTS */
-input{
-    padding:8px;
-    border-radius:5px;
-    border:none;
-    width:100%;
-    margin:5px 0;
-}
-
-/* VU */
+/* VU MESA PROFISSIONAL */
 .vu{
     display:flex;
     justify-content:center;
@@ -131,9 +131,11 @@ input{
     height:10px;
     background:#00ff2a;
     border-radius:3px;
+    transition:0.05s;
+    box-shadow:0 0 5px #00ff2a;
 }
 
-/* AVISOS */
+/* AVISO */
 .aviso{
     margin-top:10px;
     font-size:12px;
@@ -151,7 +153,6 @@ input{
 <div class="status-top">
 <div id="led"></div>
 
-<!-- 🔥 RELÓGIO RESTAURADO -->
 <div class="clock">
 <div id="time">00:00:00</div>
 <div id="date">--/--/----</div>
@@ -175,20 +176,18 @@ input{
 <p id="musica">⚫️ OFFLINE</p>
 <p id="ouvintes">0 ouvintes</p>
 
-<!-- VU -->
 <div class="vu" id="vu"></div>
 
-<!-- 🔥 AVISOS RESTAURADOS -->
 <div class="aviso">
-▶️ Clique em play para iniciar o áudio<br>
-🔄 Se parar, recarregue a página<br>
-📶 Aguarde conexão com stream
+▶ Clique no play para iniciar o rádio<br>
+🔄 Se parar, aguarde 10s e clique novamente<br>
+📡 Stream automático com fallback ativo
 </div>
 
 </div>
 
 <div class="grid">
-<div class="card">🕒 24h no ar</div>
+<div class="card">📻 24h no ar</div>
 <div class="card">🎤 Ao vivo</div>
 <div class="card">🔥 Hits atualizados</div>
 </div>
@@ -218,12 +217,19 @@ input{
 <span id="statusPlayer">Parado</span>
 </div>
 
-<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
+<audio id="audio" preload="audio"></audio>
 
 <script>
 
+/* STREAM FIX (sem quebrar no GitHub) */
+const streams = [
+"https://heights-blue-hub-remember.trycloudflare.com/stream"
+];
+
+let audio = document.getElementById("audio");
+audio.src = streams[0];
+
 /* ELEMENTOS */
-const audio = document.getElementById("audio");
 const btn = document.getElementById("btn");
 const led = document.getElementById("led");
 
@@ -233,23 +239,20 @@ document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-/* RELÓGIO RESTAURADO */
+/* RELÓGIO */
 function clock(){
 const now = new Date();
-
-document.getElementById("time").innerText =
-now.toLocaleTimeString();
-
-document.getElementById("date").innerText =
-now.toLocaleDateString();
+document.getElementById("time").innerText = now.toLocaleTimeString();
+document.getElementById("date").innerText = now.toLocaleDateString();
 }
 setInterval(clock,1000);
 clock();
 
-/* AUDIO + VU */
+/* AUDIO CONTEXT */
 let ctx, analyser, source, dataArray;
 let started = false;
 
+/* VU */
 const vu = document.getElementById("vu");
 const bars = [];
 
@@ -260,6 +263,7 @@ vu.appendChild(b);
 bars.push(b);
 }
 
+/* INIT AUDIO */
 function initAudio(){
 
 if(started) return;
@@ -267,8 +271,8 @@ if(started) return;
 ctx = new (window.AudioContext || window.webkitAudioContext)();
 
 analyser = ctx.createAnalyser();
-analyser.fftSize = 512;
-analyser.smoothingTimeConstant = 0.7;
+analyser.fftSize = 256;
+analyser.smoothingTimeConstant = 0.8;
 
 source = ctx.createMediaElementSource(audio);
 source.connect(analyser);
@@ -280,23 +284,27 @@ started = true;
 }
 
 /* PLAY */
+let running=false;
+
 function play(){
+
+initAudio();
+
+if(ctx.state==="suspended") ctx.resume();
 
 if(audio.paused){
 
-audio.play();
+audio.play().catch(()=>audio.load());
 
 btn.innerHTML='<i class="fas fa-pause"></i>';
 
-document.getElementById("statusPlayer").innerText="AO VIVO 🔴";
+document.getElementById("statusPlayer").innerText="🔴 AO VIVO";
 document.getElementById("statusTopo").innerText="🔴 AO VIVO";
 
 led.style.background="#00ff2a";
 
-initAudio();
-
-if(!window.vuRun){
-window.vuRun=true;
+if(!running){
+running=true;
 animateVU();
 }
 
@@ -313,7 +321,9 @@ led.style.background="#444";
 }
 }
 
-/* VU */
+/* VU PROFISSIONAL (GRAVE FORTE + DINÂMICO) */
+let smooth = new Array(50).fill(0);
+
 function animateVU(){
 requestAnimationFrame(animateVU);
 
@@ -323,14 +333,19 @@ analyser.getByteFrequencyData(dataArray);
 
 for(let i=0;i<bars.length;i++){
 
-let v=dataArray[i]||0;
-let h=(v/255)*120;
+let bassBoost = (dataArray[i] || 0) / 255;
+bassBoost = Math.pow(bassBoost, 1.8) * 160;
 
-bars[i].style.height=h+"px";
+smooth[i] = smooth[i]*0.7 + bassBoost*0.3;
 
-bars[i].style.background=
-h<40?"#00ff2a":
-h<80?"#ffff00":"#ff0000";
+bars[i].style.height = smooth[i]+"px";
+
+bars[i].style.background =
+smooth[i]<40 ? "#00ff2a" :
+smooth[i]<90 ? "#ffff00" : "#ff0000";
+
+bars[i].style.boxShadow =
+"0 0 "+(smooth[i]/10)+"px "+bars[i].style.background;
 }
 }
 
@@ -341,16 +356,16 @@ audio.volume=e.target.value;
 
 /* PEDIDOS */
 function enviar(){
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+let p=JSON.parse(localStorage.getItem("pedidos"))||[];
 
-pedidos.push({
+p.push({
 nome:nome.value,
 musica:musicaInput.value,
 cantor:cantor.value,
 data:new Date().toLocaleString()
 });
 
-localStorage.setItem("pedidos",JSON.stringify(pedidos));
+localStorage.setItem("pedidos",JSON.stringify(p));
 
 alert("Pedido enviado!");
 }
@@ -358,21 +373,21 @@ alert("Pedido enviado!");
 /* ADMIN */
 function openAdmin(){
 let senha=prompt("Senha:");
-if(senha!=="928374") return;
+if(senha!=="1234") return;
 
 show("admin");
 
 let lista=document.getElementById("lista");
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+let p=JSON.parse(localStorage.getItem("pedidos"))||[];
 
 lista.innerHTML="";
 
-pedidos.forEach((p,i)=>{
+p.forEach(i=>{
 lista.innerHTML+=`
 <div>
-<b>${p.nome}</b><br>
-${p.musica} - ${p.cantor}<br>
-${p.data}<hr>
+<b>${i.nome}</b><br>
+${i.musica} - ${i.cantor}<br>
+${i.data}<hr>
 </div>`;
 });
 }
