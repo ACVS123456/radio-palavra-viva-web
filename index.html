@@ -8,80 +8,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{
-margin:0;
-font-family:'Segoe UI';
-background:#0d1117;
-color:white;
-padding-bottom:70px;
-}
+body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;}
 
-.container{max-width:420px;margin:auto;padding:8px;}
+header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
+header h1{color:#1db954;font-size:16px;}
 
-header{
-background:#161b22;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:8px;
-}
+.status-top{display:flex;align-items:center;gap:10px;}
 
-header h1{color:#1db954;font-size:14px;}
-
-.status-top{display:flex;align-items:center;gap:8px;}
-
+/* 🔥 LED ERICSSON */
 #led1{
-width:8px;height:8px;border-radius:50%;
+width:10px;
+height:10px;
+border-radius:50%;
 background:#444;
-}
+box-shadow:0 0 0px lime;
+transition:all 0.5s ease;
 
+  
 .banner{
 background:linear-gradient(135deg,#1db954,#000);
-padding:10px;
+padding:20px;
 border-radius:10px;
-text-align:center;
-}
-
-.vu{
-display:flex;
-justify-content:center;
-align-items:flex-end;
-gap:2px;
-height:45px;
-margin-top:6px;
-}
-
-.bar{
-width:3px;
-display:flex;
-flex-direction:column-reverse;
-}
-
-.seg{
-width:100%;
-height:3px;
-background:#222;
-}
-
-.controls{margin-top:6px;font-size:11px;}
-
-input[type=range]{width:100%;}
-
-.page{display:none;}
-.active{display:block;}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:5px;
-margin-top:8px;
-}
-
-.card{
-background:#161b22;
-padding:6px;
-border-radius:8px;
-font-size:12px;
 }
 
 .player{
@@ -92,203 +39,396 @@ background:#161b22;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:8px;
-font-size:12px;
+padding:10px;
+}
+  
+}
+/* VU */
+.vu{
+display:flex;
+justify-content:center;
+align-items:flex-end;
+gap:2px;
+height:120px;
+margin-top:15px;
 }
 
-button{
-background:#1db954;
-border:none;
-padding:6px;
-color:white;
-border-radius:5px;
-cursor:pointer;
+.bar{
+width:5px;
+height:10px;
+background:#00ff00;
+border-radius:3px;
+transform-origin:bottom;
+transition:0.05s;
 }
+  
+.clock{text-align:center;}
+.page{display:none;padding:15px;}
+.active{display:block;}
+
+.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;text-align:center;}
+.card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
+
+.player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
+
+button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;cursor:pointer;}
+input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
+
+.admin{display:none;}
+.form-box{max-width:300px;margin:20px auto;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
-
 <header>
-<h1>🌐 Rádio Palavra Viva</h1>
+<h1>🌐Rádio Palavra Viva-WEB</h1>
+
+
 <div class="status-top">
 <div id="led1"></div>
-<div id="time"></div>
-<div id="date"></div>
+
+<div class="clock">
+<div id="time">00:00:00</div>
+<div id="date">--/--/----</div>
+</div>
 </div>
 </header>
 
-<div id="home" class="page active">
+<!-- HOME -->
 
+  <div id="home" class="page active">
 <div class="banner">
-
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
+</div>
 
+  <!-- VU -->
 <div class="vu" id="vu"></div>
-
-<div class="controls">
-🔊 Volume
-<input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
 </div>
-
-<button onclick="play()" id="btn">▶ PLAY</button>
+  
+<div class="card">📡 Transmissão 24h ativa</div>
 
 </div>
-
-<div class="card">📡 Rádio 24h Online</div>
 
 <div class="grid">
-<div class="card">🎤 Ao vivo</div>
-<div class="card">🔥 Música</div>
-<div class="card">📻 Stream ativo</div>
-<div class="card">🔄 Atualize se travar</div>
+<div class="card">📻 24h no ar</div>
+<div class="card">🎤 Programas ao vivo</div>
+<div class="card">🔥 Hits atualizados</div>
+<div class="card">▶️ Aguarde 10s após clicar</div>
+<div class="card">🔄 Atualize se parar</div>
+</div>
 </div>
 
+<!-- MENU -->
+<div style="text-align:center;">
+<button onclick="mostrar('pedido')">🎵 Pedir Música</button>
+<button onclick="abrirAdmin()">🔒 Admin</button>
+</div>
+<div id="log"></div>
+</div>
+<!-- PEDIDO -->
+<div id="pedido" class="page">
+<h3 style="text-align:center;">🎵 Pedido</h3>
+
+<div class="form-box">
+<input id="nome" placeholder="Seu nome">
+<input id="musicaInput" placeholder="Música">
+<input id="cantor" placeholder="Cantor">
+
+<button onclick="enviarPedido()">Enviar Pedido</button>
+</div>
 </div>
 
-<!-- AUDIO -->
-<audio id="audio" crossorigin="anonymous" playsinline>
-<source src="https://heights-blue-hub-remember.trycloudflare.com/stream" type="audio/mpeg">
-</audio>
+<!-- ADMIN -->
+<div id="admin" class="admin">
+<h3>📋 Pedidos Recebidos</h3>
+<div id="lista"></div>
+</div>
 
+<!-- PLAYER -->
+<div class="player">
+<button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
+<span id="statusPlayer">OFFLINE</span>
+</div>
+
+<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
+
+<div class="volume-box">
+🔊 Volume
+<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
+</div>
+
+<div class="volume-box">
+🎚️ Sensibilidade
+<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
+</div>
+
+<div class="vu" id="vu"></div>
 <script>
 
-const audio = document.getElementById("audio");
-const btn = document.getElementById("btn");
-const volume = document.getElementById("volume");
-
-let ligado = false;
-let vuInit = false;
-let bars = [];
-
-/* 🔓 DESBLOQUEIO SIMPLES (SEM AUDIOCONTEXT) */
-function unlockAudio(){
-audio.muted = false;
+// TROCA DE TELA
+function mostrar(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById(p).classList.add("active");
 }
 
-/* 🔊 VOLUME */
-volume.oninput = () => audio.volume = volume.value;
+// ENVIAR PEDIDO
+function enviarPedido(){
 
-/* ▶ PLAY */
-async function play(){
+let nome = document.getElementById("nome").value.trim();
+let musica = document.getElementById("musicaInput").value.trim();
+let cantor = document.getElementById("cantor").value.trim();
 
-try{
 
-unlockAudio();
-
-if(audio.paused){
-
-await audio.play();
-
-ligado = true;
-
-btn.innerText = "⏸ PAUSE";
-statusTopo.innerText = "🔴 AO VIVO";
-musica.innerText = "🎵 Tocando ao vivo";
-ouvintes.innerText = "👥 Online";
-
-if(!vuInit){
-initVU();
-vuInit = true;
-}
-
-}else{
-
-audio.pause();
-
-ligado = false;
-
-btn.innerText = "▶ PLAY";
-statusTopo.innerText = "⚫ OFFLINE";
-musica.innerText = "⚫ OFFLINE";
-ouvintes.innerText = "⚫ OFFLINE";
-}
-
-}catch(e){
-alert("Clique novamente para liberar o áudio");
-}
-
-}
-
-/* 📊 VU (SEM AudioContext) */
-const vu = document.getElementById("vu");
-
-for(let i=0;i<25;i++){
-let col = document.createElement("div");
-col.className = "bar";
-
-for(let j=0;j<10;j++){
-let seg = document.createElement("div");
-seg.className = "seg";
-col.appendChild(seg);
-}
-
-vu.appendChild(col);
-bars.push(col.children);
-}
-
-/* 🎛 VU SIMULADO (SEGURO) */
-function initVU(){
-
-animarVU();
-
-}
-
-function animarVU(){
-
-requestAnimationFrame(animarVU);
-
-let level = ligado ? Math.random()*10 : 0;
-
-for(let i=0;i<bars.length;i++){
-
-for(let j=0;j<bars[i].length;j++){
-
-if(j < level){
-
-if(j < 4) bars[i][j].style.background="#00ff00";
-else if(j < 7) bars[i][j].style.background="#ffff00";
-else bars[i][j].style.background="#ff0000";
-
-}else{
-bars[i][j].style.background="#222";
-}
-
-}
-
-}
-
-}
-
-/* ⏰ RELÓGIO */
-setInterval(()=>{
-time.innerText = new Date().toLocaleTimeString();
-date.innerText = new Date().toLocaleDateString();
-},1000);
-
-/* 🔴 LED */
-setInterval(()=>{
-led1.style.background = ligado ? "red" : "#444";
-},200);
-
-/* 🎵 STATUS */
-setInterval(()=>{
-
-if(!ligado){
-musica.innerText = "⚫ OFFLINE";
-ouvintes.innerText = "⚫ OFFLINE";
+if(!nome || !musica || !cantor){
+alert("Preencha tudo!");
 return;
 }
 
-musica.innerText = "🟢 Tocando ao vivo";
-ouvintes.innerText = "🟡 " + (80 + Math.floor(Math.random()*300)) + " ouvintes";
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
-},2000);
+pedidos.push({
+  nome,
+  musica,
+  cantor,
+  data: new Date().toLocaleString()
+});
 
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+alert("Pedido enviado!");
+
+document.getElementById("nome").value="";
+document.getElementById("musicaInput").value="";
+document.getElementById("cantor").value="";
+}
+
+// ADMIN
+function abrirAdmin(){
+
+let senha = prompt("Digite a senha:");
+
+if(senha !== "928374"){
+alert("Senha errada!");
+return;
+}
+
+document.getElementById("admin").style.display="block";
+carregarPedidos();
+}
+
+// LISTAR
+function carregarPedidos(){
+
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let lista = document.getElementById("lista");
+
+lista.innerHTML="";
+
+if(pedidos.length === 0){
+lista.innerHTML="Nenhum pedido ainda";
+return;
+}
+
+pedidos.forEach((p, i)=>{
+lista.innerHTML += `
+<div style="margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:5px;">
+<b>${p.nome}</b><br>
+🎵 ${p.musica}<br>
+🎤 ${p.cantor}<br>
+🕒 ${p.data}<br>
+<button onclick="apagar(${i})">Excluir</button>
+</div>
+`;
+});
+}
+
+// APAGAR
+function apagar(index){
+
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+pedidos.splice(index,1);
+
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+carregarPedidos();
+}
+
+// PLAYER
+
+function play(){
+
+if(!audio.src) carregarStream();
+
+if(!iniciado) initAudio();
+
+if(ctx.state==="suspended") ctx.resume();
+
+if(audio.paused){
+audio.play().catch(()=>alert("Clique novamente"));
+
+btn.innerHTML='<i class="fas fa-pause"></i>';
+ligado=true;
+
+statusPlayer.innerText="🔴 AO VIVO";
+statusTopo.innerText="🔴 AO VIVO";
+
+animateVU();
+
+}else{
+audio.pause();
+
+btn.innerHTML='<i class="fas fa-play"></i>';
+ligado=false;
+
+statusPlayer.innerText="⚫ OFFLINE";
+statusTopo.innerText="⚫ OFFLINE";
+}
+}
+/* PLAY AUDIO */
+
+const audio=document.getElementById("audio");
+const btn=document.getElementById("btn");
+const volumeSlider = document.getElementById("volume");
+const gainSlider = document.getElementById("gainControl");
+
+let ligado=false;
+
+function play(){
+if(audio.paused){
+audio.play();
+btn.innerHTML='<i class="fas fa-pause"></i>';
+ligado=true;
+statusPlayer.innerText="🔴 AO VIVO";
+statusTopo.innerText="🔴 AO VIVO";
+}else{
+audio.pause();
+btn.innerHTML='<i class="fas fa-play"></i>';
+ligado=false;
+statusPlayer.innerText="⚫ OFFLINE";
+statusTopo.innerText="⚫ OFFLINE";
+}
+}
+
+// RELÓGIO
+setInterval(()=>{
+time.innerText=new Date().toLocaleTimeString();
+date.innerText=new Date().toLocaleDateString();
+},1000);
+
+// SIMULAÇÕES
+setInterval(()=>{
+if(!ligado) return;
+musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
+},4000);
+
+setInterval(()=>{
+if(!ligado) return;
+ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
+},3000);
+
+  
+/* =========================
+   🔥 VU PRO
+========================= */
+
+const vu=document.getElementById("vu");
+const bars=[];
+let ctx, analyser, source, dataArray;
+let smooth=new Array(50).fill(0);
+
+/* cria barras */
+for(let i=0;i<50;i++){
+let b=document.createElement("div");
+b.classList.add("bar");
+vu.appendChild(b);
+bars.push(b);
+}
+
+/* áudio contexto */
+function initVU(){
+
+if(ctx) return;
+
+ctx=new (window.AudioContext||window.webkitAudioContext)();
+
+analyser=ctx.createAnalyser();
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.7;
+
+source=ctx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(ctx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+}
+
+/* animação */
+function animateVU(){
+requestAnimationFrame(animateVU);
+
+if(!analyser) return;
+
+analyser.getByteFrequencyData(dataArray);
+
+let center=bars.length/2;
+
+for(let i=0;i<bars.length;i++){
+
+let v=dataArray[i]||0;
+v=Math.pow(v/255,1.5)*150;
+
+smooth[i]=smooth[i]*0.6+v*0.4;
+
+let h=Math.min(smooth[i],120);
+
+bars[i].style.height=h+"px";
+
+let dist=Math.abs(i-center);
+let move=dist*(h/50);
+
+bars[i].style.transform=
+i<center?`translateX(-${move}px)`:`translateX(${move}px)`;
+
+/* cores */
+bars[i].style.background=
+h<50?"#00ff00":h<90?"#ffff00":"#ff0000";
+}
+}
+
+/* 🔥 LED SUAVE ERICSSON */
+let ledOn = false;
+
+setInterval(()=>{
+
+if(!ligado){
+led1.style.background="#444";
+led1.style.boxShadow="0 0 0px lime";
+return;
+}
+
+ledOn = !ledOn;
+
+if(ledOn){
+led1.style.background="lime";
+led1.style.boxShadow="0 0 10px lime";
+}else{
+led1.style.background="#444";
+led1.style.boxShadow="0 0 0px lime";
+}
+
+},1500);
+
+/* OUVINTES */
+setInterval(()=>{
+document.getElementById("ouvintes").innerText=
+"🟡 Ouvintes: "+Math.floor(Math.random()*300);
+},3000);
 </script>
 
 </body>
