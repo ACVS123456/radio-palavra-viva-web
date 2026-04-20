@@ -8,27 +8,101 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;}
+body{
+margin:0;
+font-family:'Segoe UI';
+background:#0d1117;
+color:white;
+padding-bottom:70px;
+}
 
-header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
-header h1{color:#1db954;font-size:16px;}
+.container{
+max-width:420px;
+margin:auto;
+padding:8px;
+}
 
-.status-top{display:flex;align-items:center;gap:10px;}
+header{
+background:#161b22;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:8px;
+}
 
-/* 🔥 LED ERICSSON */
+header h1{
+color:#1db954;
+font-size:14px;
+}
+
+.status-top{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
 #led1{
-width:10px;
-height:10px;
+width:8px;
+height:8px;
 border-radius:50%;
 background:#444;
-box-shadow:0 0 0px lime;
-transition:all 0.5s ease;
+}
 
-  
 .banner{
 background:linear-gradient(135deg,#1db954,#000);
-padding:20px;
+padding:10px;
 border-radius:10px;
+text-align:center;
+}
+
+.vu{
+display:flex;
+justify-content:center;
+align-items:flex-end;
+gap:2px;
+height:45px;
+margin-top:6px;
+}
+
+.bar{
+width:3px;
+display:flex;
+flex-direction:column-reverse;
+gap:1px;
+}
+
+.seg{
+width:100%;
+height:3px;
+background:#222;
+border-radius:2px;
+}
+
+.controls{
+margin-top:6px;
+font-size:11px;
+}
+
+input[type=range]{
+height:3px;
+width:100%;
+}
+
+.page{display:none;}
+.active{display:block;}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:5px;
+margin-top:8px;
+}
+
+.card{
+background:#161b22;
+padding:6px;
+border-radius:8px;
+font-size:12px;
 }
 
 .player{
@@ -37,79 +111,63 @@ bottom:0;
 width:100%;
 background:#161b22;
 display:flex;
-justify-content:space-between;
 align-items:center;
-padding:10px;
+justify-content:space-between;
+padding:8px;
+font-size:12px;
 }
-  
-}
-/* VU */
-.vu{
+
+.player-controls{
 display:flex;
-justify-content:center;
-align-items:flex-end;
-gap:2px;
-height:120px;
-margin-top:15px;
+gap:5px;
+align-items:center;
 }
 
-.bar{
-width:5px;
-height:10px;
-background:#00ff00;
-border-radius:3px;
-transform-origin:bottom;
-transition:0.05s;
+button{
+background:#1db954;
+border:none;
+padding:6px;
+color:white;
+border-radius:5px;
+cursor:pointer;
 }
-  
-.clock{text-align:center;}
-.page{display:none;padding:15px;}
-.active{display:block;}
-
-.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;text-align:center;}
-.card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
-
-.player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
-
-button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;cursor:pointer;}
-input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
-
-.admin{display:none;}
-.form-box{max-width:300px;margin:20px auto;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
 </style>
-
 </head>
 
 <body>
 
-<header>
-<h1>🌐Rádio Palavra Viva-WEB</h1>
+<div class="container">
 
+<header>
+<h1>🌐 Rádio Palavra Viva</h1>
 
 <div class="status-top">
 <div id="led1"></div>
 
-<div class="clock">
-<div id="time">00:00:00</div>
-<div id="date">--/--/----</div>
+<div>
+<div id="time"></div>
+<div id="date"></div>
 </div>
 </div>
 </header>
 
 <!-- HOME -->
+<div id="home" class="page active">
 
-  <div id="home" class="page active">
 <div class="banner">
+
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
+
+<div class="vu" id="vu"></div>
+
+<div class="controls">
+🔊 Volume / Sensibilidade
+<input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
 </div>
 
-  <!-- VU -->
-<div class="vu" id="vu"></div>
 </div>
-  
 <div class="card">📡 Transmissão 24h ativa</div>
 
 </div>
@@ -121,245 +179,162 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <div class="card">▶️ Aguarde 10s após clicar</div>
 <div class="card">🔄 Atualize se parar</div>
 </div>
-</div>
 
-<!-- MENU -->
-<div style="text-align:center;">
-<button onclick="mostrar('pedido')">🎵 Pedir Música</button>
+
+<div style="text-align:center;margin-top:10px;">
+<button onclick="mostrar('pedido')">🎵 Pedido</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
-<div id="log"></div>
+
 </div>
+
 <!-- PEDIDO -->
 <div id="pedido" class="page">
-<h3 style="text-align:center;">🎵 Pedido</h3>
+<h3>🎵 Pedido</h3>
 
-<div class="form-box">
 <input id="nome" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
 <input id="cantor" placeholder="Cantor">
 
-<button onclick="enviarPedido()">Enviar Pedido</button>
-</div>
+<button onclick="enviarPedido()">Enviar</button>
+<button onclick="mostrar('home')">⬅ Voltar</button>
 </div>
 
 <!-- ADMIN -->
-<div id="admin" class="admin">
-<h3>📋 Pedidos Recebidos</h3>
+<div id="admin" class="page">
+<h3>📋 Pedidos</h3>
 <div id="lista"></div>
+
+<button onclick="mostrar('home')">⬅ Voltar</button>
+</div>
+
 </div>
 
 <!-- PLAYER -->
 <div class="player">
-<button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
+
+<div class="player-controls">
+<button onclick="mostrar('home')"><i class="fas fa-home"></i></button>
+
+<button onclick="play()" id="btn">
+<i class="fas fa-play"></i>
+</button>
+</div>
+
 <span id="statusPlayer">OFFLINE</span>
+
 </div>
 
 <audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
-<div class="volume-box">
-🔊 Volume
-<input type="range" min="0" max="1" step="0.01" value="1" id="volume">
-</div>
-
-<div class="volume-box">
-🎚️ Sensibilidade
-<input type="range" min="1" max="5" step="0.1" value="2" id="gainControl">
-</div>
-
-<div class="vu" id="vu"></div>
 <script>
 
-// TROCA DE TELA
+const audio=document.getElementById("audio");
+const btn=document.getElementById("btn");
+const volumeSlider=document.getElementById("volume");
+
+let ctx, analyser, source, dataArray;
+let bars=[];
+let ligado=false;
+
+/* NAVEGAÇÃO */
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// ENVIAR PEDIDO
+/* PEDIDOS */
 function enviarPedido(){
+let nome=document.getElementById("nome").value.trim();
+let musica=document.getElementById("musicaInput").value.trim();
+let cantor=document.getElementById("cantor").value.trim();
 
-let nome = document.getElementById("nome").value.trim();
-let musica = document.getElementById("musicaInput").value.trim();
-let cantor = document.getElementById("cantor").value.trim();
+if(!nome||!musica||!cantor) return alert("Preencha tudo");
 
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+pedidos.push({nome,musica,cantor});
+localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
-if(!nome || !musica || !cantor){
-alert("Preencha tudo!");
-return;
+alert("Enviado!");
 }
 
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-pedidos.push({
-  nome,
-  musica,
-  cantor,
-  data: new Date().toLocaleString()
-});
-
-localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-alert("Pedido enviado!");
-
-document.getElementById("nome").value="";
-document.getElementById("musicaInput").value="";
-document.getElementById("cantor").value="";
-}
-
-// ADMIN
+/* ADMIN */
 function abrirAdmin(){
-
-let senha = prompt("Digite a senha:");
-
-if(senha !== "928374"){
-alert("Senha errada!");
-return;
-}
-
-document.getElementById("admin").style.display="block";
+let senha=prompt("Senha:");
+if(senha!=="928374"){alert("Errada");return;}
+mostrar('admin');
 carregarPedidos();
 }
 
-// LISTAR
 function carregarPedidos(){
-
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-let lista = document.getElementById("lista");
-
+let lista=document.getElementById("lista");
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
 lista.innerHTML="";
 
-if(pedidos.length === 0){
-lista.innerHTML="Nenhum pedido ainda";
-return;
-}
-
-pedidos.forEach((p, i)=>{
-lista.innerHTML += `
-<div style="margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:5px;">
-<b>${p.nome}</b><br>
-🎵 ${p.musica}<br>
-🎤 ${p.cantor}<br>
-🕒 ${p.data}<br>
-<button onclick="apagar(${i})">Excluir</button>
-</div>
-`;
+pedidos.forEach(p=>{
+lista.innerHTML+=`<div>${p.nome} - ${p.musica}</div>`;
 });
 }
 
-// APAGAR
-function apagar(index){
+/* VOLUME */
+volumeSlider.oninput=()=>{
+audio.volume=volumeSlider.value;
+};
 
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-pedidos.splice(index,1);
-
-localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-carregarPedidos();
-}
-
-// PLAYER
-
+/* PLAY */
 function play(){
 
-if(!audio.src) carregarStream();
-
-if(!iniciado) initAudio();
-
+if(!ctx) initVU();
 if(ctx.state==="suspended") ctx.resume();
 
 if(audio.paused){
+
 audio.play().catch(()=>alert("Clique novamente"));
 
 btn.innerHTML='<i class="fas fa-pause"></i>';
 ligado=true;
 
 statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
+statusTopo.innerHTML="🔴 AO VIVO";
 
 animateVU();
 
 }else{
+
 audio.pause();
 
 btn.innerHTML='<i class="fas fa-play"></i>';
 ligado=false;
 
 statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
-}
-}
-/* PLAY AUDIO */
-
-const audio=document.getElementById("audio");
-const btn=document.getElementById("btn");
-const volumeSlider = document.getElementById("volume");
-const gainSlider = document.getElementById("gainControl");
-
-let ligado=false;
-
-function play(){
-if(audio.paused){
-audio.play();
-btn.innerHTML='<i class="fas fa-pause"></i>';
-ligado=true;
-statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
-}else{
-audio.pause();
-btn.innerHTML='<i class="fas fa-play"></i>';
-ligado=false;
-statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
+statusTopo.innerHTML="⚫ OFFLINE";
 }
 }
 
-// RELÓGIO
-setInterval(()=>{
-time.innerText=new Date().toLocaleTimeString();
-date.innerText=new Date().toLocaleDateString();
-},1000);
-
-// SIMULAÇÕES
-setInterval(()=>{
-if(!ligado) return;
-musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
-},4000);
-
-setInterval(()=>{
-if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
-},3000);
-
-  
-/* =========================
-   🔥 VU PRO
-========================= */
-
+/* VU */
 const vu=document.getElementById("vu");
-const bars=[];
-let ctx, analyser, source, dataArray;
-let smooth=new Array(50).fill(0);
 
-/* cria barras */
-for(let i=0;i<50;i++){
-let b=document.createElement("div");
-b.classList.add("bar");
-vu.appendChild(b);
-bars.push(b);
+for(let i=0;i<30;i++){
+let col=document.createElement("div");
+col.classList.add("bar");
+
+let segments=[];
+for(let j=0;j<10;j++){
+let s=document.createElement("div");
+s.classList.add("seg");
+col.appendChild(s);
+segments.push(s);
 }
 
-/* áudio contexto */
+vu.appendChild(col);
+bars.push(segments);
+}
+
+/* INIT */
 function initVU(){
-
-if(ctx) return;
-
 ctx=new (window.AudioContext||window.webkitAudioContext)();
-
 analyser=ctx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.7;
+analyser.fftSize=256;
 
 source=ctx.createMediaElementSource(audio);
 source.connect(analyser);
@@ -368,67 +343,58 @@ analyser.connect(ctx.destination);
 dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
 
-/* animação */
+/* ANIMAÇÃO */
 function animateVU(){
 requestAnimationFrame(animateVU);
-
 if(!analyser) return;
 
 analyser.getByteFrequencyData(dataArray);
 
-let center=bars.length/2;
+let nivel=audio.volume;
 
 for(let i=0;i<bars.length;i++){
-
 let v=dataArray[i]||0;
-v=Math.pow(v/255,1.5)*150;
+let intensidade=(v/255)*bars[i].length*(nivel+0.2);
 
-smooth[i]=smooth[i]*0.6+v*0.4;
-
-let h=Math.min(smooth[i],120);
-
-bars[i].style.height=h+"px";
-
-let dist=Math.abs(i-center);
-let move=dist*(h/50);
-
-bars[i].style.transform=
-i<center?`translateX(-${move}px)`:`translateX(${move}px)`;
-
-/* cores */
-bars[i].style.background=
-h<50?"#00ff00":h<90?"#ffff00":"#ff0000";
+bars[i].forEach((seg,index)=>{
+if(index<intensidade){
+if(index<4) seg.style.background="#00ff00";
+else if(index<7) seg.style.background="#ffff00";
+else seg.style.background="#ff0000";
+}else{
+seg.style.background="#222";
+}
+});
 }
 }
 
-/* 🔥 LED SUAVE ERICSSON */
-let ledOn = false;
-
+/* RELÓGIO */
 setInterval(()=>{
+time.innerText=new Date().toLocaleTimeString();
+date.innerText=new Date().toLocaleDateString();
+},1000);
 
+/* LED STROBO */
+setInterval(()=>{
 if(!ligado){
 led1.style.background="#444";
-led1.style.boxShadow="0 0 0px lime";
 return;
 }
+led1.style.background=Math.random()>0.5?"red":"#300";
+},250);
 
-ledOn = !ledOn;
-
-if(ledOn){
-led1.style.background="lime";
-led1.style.boxShadow="0 0 10px lime";
-}else{
-led1.style.background="#444";
-led1.style.boxShadow="0 0 0px lime";
-}
-
-},1500);
+/* MÚSICA */
+setInterval(()=>{
+if(!ligado) return;
+musica.innerText="🟢 Música "+Math.floor(Math.random()*100);
+},4000);
 
 /* OUVINTES */
 setInterval(()=>{
-document.getElementById("ouvintes").innerText=
-"🟡 Ouvintes: "+Math.floor(Math.random()*300);
+if(!ligado) return;
+ouvintes.innerText="🟡 "+Math.floor(Math.random()*300)+" ouvintes";
 },3000);
+
 </script>
 
 </body>
