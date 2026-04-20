@@ -16,11 +16,7 @@ color:white;
 padding-bottom:70px;
 }
 
-.container{
-max-width:420px;
-margin:auto;
-padding:8px;
-}
+.container{max-width:420px;margin:auto;padding:8px;}
 
 header{
 background:#161b22;
@@ -30,21 +26,12 @@ align-items:center;
 padding:8px;
 }
 
-header h1{
-color:#1db954;
-font-size:14px;
-}
+header h1{color:#1db954;font-size:14px;}
 
-.status-top{
-display:flex;
-align-items:center;
-gap:8px;
-}
+.status-top{display:flex;align-items:center;gap:8px;}
 
 #led1{
-width:8px;
-height:8px;
-border-radius:50%;
+width:8px;height:8px;border-radius:50%;
 background:#444;
 }
 
@@ -68,25 +55,17 @@ margin-top:6px;
 width:3px;
 display:flex;
 flex-direction:column-reverse;
-gap:1px;
 }
 
 .seg{
 width:100%;
 height:3px;
 background:#222;
-border-radius:2px;
 }
 
-.controls{
-margin-top:6px;
-font-size:11px;
-}
+.controls{margin-top:6px;font-size:11px;}
 
-input[type=range]{
-height:3px;
-width:100%;
-}
+input[type=range]{width:100%;}
 
 .page{display:none;}
 .active{display:block;}
@@ -111,16 +90,10 @@ bottom:0;
 width:100%;
 background:#161b22;
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
 padding:8px;
 font-size:12px;
-}
-
-.player-controls{
-display:flex;
-gap:5px;
-align-items:center;
 }
 
 button{
@@ -147,9 +120,11 @@ cursor:pointer;
 </div>
 </header>
 
+<!-- HOME -->
 <div id="home" class="page active">
 
 <div class="banner">
+
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
@@ -160,71 +135,211 @@ cursor:pointer;
 🔊 Volume
 <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
 </div>
+
+<button onclick="play()" id="btn">▶ PLAY</button>
+
 </div>
 
-<div class="card">📡 Transmissão 24h ativa</div>
+<div class="card">📡 Rádio 24h Online</div>
 
 <div class="grid">
-<div class="card">📻 24h no ar</div>
-<div class="card">🎤 Programas ao vivo</div>
-<div class="card">🔥 Hits atualizados</div>
-<div class="card">▶️ Aguarde 10s após clicar</div>
-<div class="card">🔄 Atualize se parar</div>
+<div class="card">🎤 Ao vivo</div>
+<div class="card">🔥 Música</div>
+<div class="card">📻 Stream ativo</div>
+<div class="card">🔄 Atualize se travar</div>
 </div>
 
 <div style="text-align:center;margin-top:10px;">
 <button onclick="mostrar('pedido')">🎵 Pedido</button>
-<button onclick="abrirAdmin()">🔒 Admin</button>
+<button onclick="mostrar('admin')">🔒 Admin</button>
 </div>
 
 </div>
 
+<!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
 <input id="nome" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
 <input id="cantor" placeholder="Cantor">
 <button onclick="enviarPedido()">Enviar</button>
-<button onclick="mostrar('home')">⬅ Voltar</button>
+<button onclick="mostrar('home')">Voltar</button>
 </div>
 
+<!-- ADMIN -->
 <div id="admin" class="page">
 <h3>📋 Pedidos</h3>
 <div id="lista"></div>
-<button onclick="mostrar('home')">⬅ Voltar</button>
+<button onclick="mostrar('home')">Voltar</button>
 </div>
 
 </div>
 
-<div class="player">
-<div class="player-controls">
-<button onclick="mostrar('home')"><i class="fas fa-home"></i></button>
-<button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
-</div>
-<span id="statusPlayer">OFFLINE</span>
-</div>
-
-<!-- 🔥 ÁUDIO CORRIGIDO -->
-<audio id="audio" crossorigin="anonymous" muted playsinline>
-  <source src="https://heights-blue-hub-remember.trycloudflare.com/stream" type="audio/mpeg">
+<!-- AUDIO -->
+<audio id="audio" crossorigin="anonymous">
+<source src="https://heights-blue-hub-remember.trycloudflare.com/stream" type="audio/mpeg">
 </audio>
 
 <script>
 
 const audio=document.getElementById("audio");
 const btn=document.getElementById("btn");
-const volumeSlider=document.getElementById("volume");
+const volume=document.getElementById("volume");
+
+const statusTopo=document.getElementById("statusTopo");
+const statusPlayer=document.getElementById("statusPlayer");
+const musica=document.getElementById("musica");
+const ouvintes=document.getElementById("ouvintes");
 
 let ctx, analyser, source, dataArray;
-let bars=[];
+let vuInit=false;
 let ligado=false;
-let vuAtivo=false;
+let bars=[];
 
-/* 🔓 DESBLOQUEIO GLOBAL (RESOLVE O BUG) */
-document.addEventListener("click", () => {
-    if(audio.muted) audio.muted=false;
-    if(ctx && ctx.state==="suspended") ctx.resume();
-}, {once:true});
+/* 🔓 DESBLOQUEIO */
+function unlockAudio(){
+audio.muted=false;
+if(ctx && ctx.state==="suspended"){
+ctx.resume();
+}
+}
+
+/* 🔊 VOLUME */
+volume.oninput=()=>audio.volume=volume.value;
+
+/* ▶ PLAY */
+async function play(){
+
+try{
+
+unlockAudio();
+
+if(!vuInit){
+initVU();
+vuInit=true;
+}
+
+if(audio.paused){
+
+await audio.play();
+
+ligado=true;
+
+btn.innerText="⏸ PAUSE";
+statusTopo.innerText="🔴 AO VIVO";
+statusPlayer.innerText="🔴 AO VIVO";
+musica.innerText="🎵 Tocando ao vivo";
+ouvintes.innerText="👥 Online";
+
+}else{
+
+audio.pause();
+
+ligado=false;
+
+btn.innerText="▶ PLAY";
+statusTopo.innerText="⚫ OFFLINE";
+statusPlayer.innerText="⚫ OFFLINE";
+musica.innerText="⚫ OFFLINE";
+ouvintes.innerText="⚫ OFFLINE";
+}
+
+}catch(e){
+alert("Clique novamente para liberar áudio");
+}
+
+}
+
+/* 📊 VU */
+const vu=document.getElementById("vu");
+
+for(let i=0;i<25;i++){
+let col=document.createElement("div");
+col.className="bar";
+
+for(let j=0;j<10;j++){
+let seg=document.createElement("div");
+seg.className="seg";
+col.appendChild(seg);
+}
+
+vu.appendChild(col);
+bars.push(col.children);
+}
+
+/* 🎛 VU INIT */
+function initVU(){
+
+ctx=new (window.AudioContext||window.webkitAudioContext)();
+analyser=ctx.createAnalyser();
+analyser.fftSize=256;
+
+source=ctx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(ctx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+animarVU();
+
+}
+
+/* 📊 ANIMA VU */
+function animarVU(){
+
+requestAnimationFrame(animarVU);
+
+if(!analyser) return;
+
+analyser.getByteFrequencyData(dataArray);
+
+for(let i=0;i<bars.length;i++){
+
+let v=dataArray[i]||0;
+let level=(v/255)*10;
+
+for(let j=0;j<bars[i].length;j++){
+
+if(j<level){
+
+if(j<4) bars[i][j].style.background="#00ff00";
+else if(j<7) bars[i][j].style.background="#ffff00";
+else bars[i][j].style.background="#ff0000";
+
+}else{
+bars[i][j].style.background="#222";
+}
+
+}
+
+}
+
+}
+
+/* ⏰ RELÓGIO */
+setInterval(()=>{
+time.innerText=new Date().toLocaleTimeString();
+date.innerText=new Date().toLocaleDateString();
+},1000);
+
+/* 🔴 LED */
+setInterval(()=>{
+led1.style.background=ligado?"red":"#444";
+},200);
+
+/* 🎵 SIMULAÇÃO */
+setInterval(()=>{
+
+if(!ligado){
+musica.innerText="⚫ OFFLINE";
+ouvintes.innerText="⚫ OFFLINE";
+return;
+}
+
+musica.innerText="🎵 Tocando ao vivo";
+ouvintes.innerText="👥 "+(80+Math.floor(Math.random()*300))+" ouvintes";
+
+},2000);
 
 /* NAV */
 function mostrar(p){
@@ -232,174 +347,34 @@ document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-/* PEDIDO */
+/* PEDIDOS */
 function enviarPedido(){
-let n=nome.value.trim();
-let m=musicaInput.value.trim();
-let c=cantor.value.trim();
 
-if(!n||!m||!c) return alert("Preencha tudo");
+let n=nome.value,m=musicaInput.value,c=cantor.value;
+if(!n||!m||!c)return alert("Preencha tudo");
 
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-pedidos.push({n,m,c});
-localStorage.setItem("pedidos",JSON.stringify(pedidos));
+let p=JSON.parse(localStorage.getItem("pedidos")||"[]");
+p.push({n,m,c});
+localStorage.setItem("pedidos",JSON.stringify(p));
 
 alert("Enviado!");
+
 }
 
 /* ADMIN */
-function abrirAdmin(){
+function mostrarAdmin(){
+
 let senha=prompt("Senha:");
-if(senha!=="928374") return alert("Errada");
-mostrar('admin');
-carregarPedidos();
-}
+if(senha!=="928374")return;
 
-function carregarPedidos(){
+mostrar("admin");
+
 let lista=document.getElementById("lista");
-let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-lista.innerHTML="";
-pedidos.forEach(p=>{
-lista.innerHTML+=`<div>${p.n} - ${p.m}</div>`;
-});
+let p=JSON.parse(localStorage.getItem("pedidos")||"[]");
+
+lista.innerHTML=p.map(x=>`<div>${x.n} - ${x.m}</div>`).join("");
+
 }
-
-/* VOLUME */
-volumeSlider.oninput=()=> audio.volume=volumeSlider.value;
-
-/* PLAY CORRIGIDO */
-async function play(){
-
-if(!ctx) iniciarVU();
-
-try{
-
-if(ctx && ctx.state==="suspended"){
-await ctx.resume();
-}
-
-if(audio.paused){
-
-await audio.play();
-
-btn.innerHTML='<i class="fas fa-pause"></i>';
-ligado=true;
-
-statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
-
-}else{
-
-audio.pause();
-
-btn.innerHTML='<i class="fas fa-play"></i>';
-ligado=false;
-
-statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
-}
-
-}catch(e){
-alert("🔒 Clique novamente para liberar o áudio");
-}
-}
-
-/* VU */
-const vu=document.getElementById("vu");
-
-for(let i=0;i<30;i++){
-let col=document.createElement("div");
-col.classList.add("bar");
-
-let segs=[];
-for(let j=0;j<10;j++){
-let s=document.createElement("div");
-s.classList.add("seg");
-col.appendChild(s);
-segs.push(s);
-}
-
-vu.appendChild(col);
-bars.push(segs);
-}
-
-/* INIT VU */
-function iniciarVU(){
-try{
-ctx=new (window.AudioContext||window.webkitAudioContext)();
-analyser=ctx.createAnalyser();
-analyser.fftSize=256;
-
-try{
-source=ctx.createMediaElementSource(audio);
-source.connect(analyser);
-analyser.connect(ctx.destination);
-}catch(e){
-console.warn("VU bloqueado (CORS)");
-vuAtivo=false;
-return;
-}
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-
-vuAtivo=true;
-animarVU();
-
-}catch(e){
-vuAtivo=false;
-}
-}
-
-/* VU 3 CORES */
-function animarVU(){
-if(!vuAtivo) return;
-
-requestAnimationFrame(animarVU);
-
-analyser.getByteFrequencyData(dataArray);
-
-for(let i=0;i<bars.length;i++){
-let v=dataArray[i]||0;
-let intensidade=(v/255)*bars[i].length;
-
-bars[i].forEach((seg,index)=>{
-if(index<intensidade){
-
-if(index < bars[i].length * 0.4){
-seg.style.background="#00ff00";
-}
-else if(index < bars[i].length * 0.7){
-seg.style.background="#ffff00";
-}
-else{
-seg.style.background="#ff0000";
-}
-
-}else{
-seg.style.background="#222";
-}
-});
-}
-}
-
-/* RELÓGIO */
-setInterval(()=>{
-time.innerText=new Date().toLocaleTimeString();
-date.innerText=new Date().toLocaleDateString();
-},1000);
-
-/* LED */
-setInterval(()=>{
-if(!ligado){led1.style.background="#444";return;}
-led1.style.background=Math.random()>0.5?"red":"#300";
-},200);
-
-/* INFO */
-setInterval(()=>{
-if(!ligado) return;
-musica.innerText="🟢 Música "+Math.floor(Math.random()*100);
-ouvintes.innerText="🟡 "+Math.floor(Math.random()*300)+" ouvintes";
-},3000);
 
 </script>
 
