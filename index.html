@@ -143,19 +143,14 @@ cursor:pointer;
 
 <div class="status-top">
 <div id="led1"></div>
-
-<div>
 <div id="time"></div>
 <div id="date"></div>
 </div>
-</div>
 </header>
 
-<!-- HOME -->
 <div id="home" class="page active">
 
 <div class="banner">
-
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
@@ -163,14 +158,12 @@ cursor:pointer;
 <div class="vu" id="vu"></div>
 
 <div class="controls">
-🔊 Volume / Sensibilidade
+🔊 Volume
 <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
 </div>
-
 </div>
+
 <div class="card">📡 Transmissão 24h ativa</div>
-
-</div>
 
 <div class="grid">
 <div class="card">📻 24h no ar</div>
@@ -180,7 +173,6 @@ cursor:pointer;
 <div class="card">🔄 Atualize se parar</div>
 </div>
 
-
 <div style="text-align:center;margin-top:10px;">
 <button onclick="mostrar('pedido')">🎵 Pedido</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
@@ -188,44 +180,33 @@ cursor:pointer;
 
 </div>
 
-<!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3>🎵 Pedido</h3>
-
 <input id="nome" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
 <input id="cantor" placeholder="Cantor">
-
 <button onclick="enviarPedido()">Enviar</button>
 <button onclick="mostrar('home')">⬅ Voltar</button>
 </div>
 
-<!-- ADMIN -->
 <div id="admin" class="page">
 <h3>📋 Pedidos</h3>
 <div id="lista"></div>
-
 <button onclick="mostrar('home')">⬅ Voltar</button>
 </div>
 
 </div>
 
-<!-- PLAYER -->
 <div class="player">
-
 <div class="player-controls">
 <button onclick="mostrar('home')"><i class="fas fa-home"></i></button>
-
-<button onclick="play()" id="btn">
-<i class="fas fa-play"></i>
-</button>
+<button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
 </div>
-
 <span id="statusPlayer">OFFLINE</span>
-
 </div>
 
-<audio id="audio" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
+<!-- 🔥 CROSSORIGIN (ESSENCIAL) -->
+<audio id="audio" crossorigin="anonymous" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
 
 <script>
 
@@ -236,23 +217,24 @@ const volumeSlider=document.getElementById("volume");
 let ctx, analyser, source, dataArray;
 let bars=[];
 let ligado=false;
+let vuAtivo=false;
 
-/* NAVEGAÇÃO */
+/* NAV */
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-/* PEDIDOS */
+/* PEDIDO */
 function enviarPedido(){
-let nome=document.getElementById("nome").value.trim();
-let musica=document.getElementById("musicaInput").value.trim();
-let cantor=document.getElementById("cantor").value.trim();
+let n=document.getElementById("nome").value.trim();
+let m=document.getElementById("musicaInput").value.trim();
+let c=document.getElementById("cantor").value.trim();
 
-if(!nome||!musica||!cantor) return alert("Preencha tudo");
+if(!n||!m||!c) return alert("Preencha tudo");
 
 let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
-pedidos.push({nome,musica,cantor});
+pedidos.push({n,m,c});
 localStorage.setItem("pedidos",JSON.stringify(pedidos));
 
 alert("Enviado!");
@@ -261,7 +243,7 @@ alert("Enviado!");
 /* ADMIN */
 function abrirAdmin(){
 let senha=prompt("Senha:");
-if(senha!=="928374"){alert("Errada");return;}
+if(senha!=="928374") return alert("Errada");
 mostrar('admin');
 carregarPedidos();
 }
@@ -270,22 +252,20 @@ function carregarPedidos(){
 let lista=document.getElementById("lista");
 let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
 lista.innerHTML="";
-
 pedidos.forEach(p=>{
-lista.innerHTML+=`<div>${p.nome} - ${p.musica}</div>`;
+lista.innerHTML+=`<div>${p.n} - ${p.m}</div>`;
 });
 }
 
 /* VOLUME */
-volumeSlider.oninput=()=>{
-audio.volume=volumeSlider.value;
-};
+volumeSlider.oninput=()=> audio.volume=volumeSlider.value;
 
 /* PLAY */
 function play(){
 
 if(!ctx) initVU();
-if(ctx.state==="suspended") ctx.resume();
+
+if(ctx && ctx.state==="suspended") ctx.resume();
 
 if(audio.paused){
 
@@ -295,9 +275,9 @@ btn.innerHTML='<i class="fas fa-pause"></i>';
 ligado=true;
 
 statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerHTML="🔴 AO VIVO";
+statusTopo.innerText="🔴 AO VIVO";
 
-animateVU();
+if(vuAtivo) animateVU();
 
 }else{
 
@@ -307,7 +287,7 @@ btn.innerHTML='<i class="fas fa-play"></i>';
 ligado=false;
 
 statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerHTML="⚫ OFFLINE";
+statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
@@ -318,20 +298,21 @@ for(let i=0;i<30;i++){
 let col=document.createElement("div");
 col.classList.add("bar");
 
-let segments=[];
+let segs=[];
 for(let j=0;j<10;j++){
 let s=document.createElement("div");
 s.classList.add("seg");
 col.appendChild(s);
-segments.push(s);
+segs.push(s);
 }
 
 vu.appendChild(col);
-bars.push(segments);
+bars.push(segs);
 }
 
-/* INIT */
+/* INIT VU */
 function initVU(){
+try{
 ctx=new (window.AudioContext||window.webkitAudioContext)();
 analyser=ctx.createAnalyser();
 analyser.fftSize=256;
@@ -341,26 +322,40 @@ source.connect(analyser);
 analyser.connect(ctx.destination);
 
 dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+vuAtivo=true;
+
+}catch(e){
+console.warn("VU desativado (CORS)");
+vuAtivo=false;
+}
 }
 
-/* ANIMAÇÃO */
+/* 🔥 VU COM 3 CORES */
 function animateVU(){
+if(!vuAtivo) return;
+
 requestAnimationFrame(animateVU);
-if(!analyser) return;
 
 analyser.getByteFrequencyData(dataArray);
 
-let nivel=audio.volume;
-
 for(let i=0;i<bars.length;i++){
 let v=dataArray[i]||0;
-let intensidade=(v/255)*bars[i].length*(nivel+0.2);
+let intensidade=(v/255)*bars[i].length;
 
 bars[i].forEach((seg,index)=>{
 if(index<intensidade){
-if(index<4) seg.style.background="#00ff00";
-else if(index<7) seg.style.background="#ffff00";
-else seg.style.background="#ff0000";
+
+if(index < bars[i].length * 0.4){
+seg.style.background="#00ff00"; // verde
+}
+else if(index < bars[i].length * 0.7){
+seg.style.background="#ffff00"; // amarelo
+}
+else{
+seg.style.background="#ff0000"; // vermelho
+}
+
 }else{
 seg.style.background="#222";
 }
@@ -374,24 +369,16 @@ time.innerText=new Date().toLocaleTimeString();
 date.innerText=new Date().toLocaleDateString();
 },1000);
 
-/* LED STROBO */
+/* LED */
 setInterval(()=>{
-if(!ligado){
-led1.style.background="#444";
-return;
-}
+if(!ligado){led1.style.background="#444";return;}
 led1.style.background=Math.random()>0.5?"red":"#300";
-},250);
+},200);
 
-/* MÚSICA */
+/* INFO */
 setInterval(()=>{
 if(!ligado) return;
 musica.innerText="🟢 Música "+Math.floor(Math.random()*100);
-},4000);
-
-/* OUVINTES */
-setInterval(()=>{
-if(!ligado) return;
 ouvintes.innerText="🟡 "+Math.floor(Math.random()*300)+" ouvintes";
 },3000);
 
