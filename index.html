@@ -23,8 +23,27 @@ border-radius:50%;
 background:#444;
 box-shadow:0 0 0px lime;
 transition:all 0.5s ease;
+  
+}
+/* VU */
+.vu{
+display:flex;
+justify-content:center;
+align-items:flex-end;
+gap:2px;
+height:120px;
+margin-top:15px;
 }
 
+.bar{
+width:5px;
+height:10px;
+background:#00ff00;
+border-radius:3px;
+transform-origin:bottom;
+transition:0.05s;
+}
+  
 .clock{text-align:center;}
 .page{display:none;padding:15px;}
 .active{display:block;}
@@ -65,6 +84,14 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
+</div>
+
+  <!-- VU -->
+<div class="vu" id="vu"></div>
+</div>
+  
+<div class="card">📡 Transmissão 24h ativa</div>
+
 </div>
 
 <div class="grid">
@@ -237,6 +264,75 @@ setInterval(()=>{
 if(!ligado) return;
 ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
 },3000);
+
+  
+/* =========================
+   🔥 VU PRO
+========================= */
+
+const vu=document.getElementById("vu");
+const bars=[];
+let ctx, analyser, source, dataArray;
+let smooth=new Array(50).fill(0);
+
+/* cria barras */
+for(let i=0;i<50;i++){
+let b=document.createElement("div");
+b.classList.add("bar");
+vu.appendChild(b);
+bars.push(b);
+}
+
+/* áudio contexto */
+function initVU(){
+
+if(ctx) return;
+
+ctx=new (window.AudioContext||window.webkitAudioContext)();
+
+analyser=ctx.createAnalyser();
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.7;
+
+source=ctx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(ctx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+}
+
+/* animação */
+function animateVU(){
+requestAnimationFrame(animateVU);
+
+if(!analyser) return;
+
+analyser.getByteFrequencyData(dataArray);
+
+let center=bars.length/2;
+
+for(let i=0;i<bars.length;i++){
+
+let v=dataArray[i]||0;
+v=Math.pow(v/255,1.5)*150;
+
+smooth[i]=smooth[i]*0.6+v*0.4;
+
+let h=Math.min(smooth[i],120);
+
+bars[i].style.height=h+"px";
+
+let dist=Math.abs(i-center);
+let move=dist*(h/50);
+
+bars[i].style.transform=
+i<center?`translateX(-${move}px)`:`translateX(${move}px)`;
+
+/* cores */
+bars[i].style.background=
+h<50?"#00ff00":h<90?"#ffff00":"#ff0000";
+}
+}
 
 /* 🔥 LED SUAVE ERICSSON */
 let ledOn = false;
