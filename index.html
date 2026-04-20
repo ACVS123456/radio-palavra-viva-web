@@ -86,6 +86,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <header>
 <h1>🌐Rádio Palavra Viva-WEB</h1>
 
+
 <div class="status-top">
 <div id="led1"></div>
 
@@ -98,10 +99,12 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <!-- HOME -->
 
-  <div class="banner">
-<h2>🔴 AO VIVO</h2>
-<p id="musica">⚫️ Tocando: Rádio Master</p>
-<p id="ouvintes">⚫️ Ouvintes: 0</p>
+  <div id="home" class="page active">
+<div class="banner">
+<h2 id="statusTopo">⚫ OFFLINE</h2>
+<p id="musica">⚫ OFFLINE</p>
+<p id="ouvintes">⚫ OFFLINE</p>
+</div>
 
   <!-- VU -->
 <div class="vu" id="vu"></div>
@@ -245,31 +248,28 @@ carregarPedidos();
 }
 
 // PLAYER
-const audio=document.getElementById("audio");
-const btn=document.getElementById("btn");
-const status=document.getElementById("status");
 
-/* NAV */
-function show(p){
-document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-document.getElementById(p).classList.add("active");
-}
 
 /* PLAY AUDIO */
-function play(){
 
+const audio=document.getElementById("audio");
+const btn=document.getElementById("btn");
+
+let ligado=false;
+
+function play(){
 if(audio.paused){
 audio.play();
-btn.innerText="⏸️ Pause";
-status.innerText="AO VIVO 🔴";
-
-initVU();
-animateVU();
-
+btn.innerHTML='<i class="fas fa-pause"></i>';
+ligado=true;
+statusPlayer.innerText="🔴 AO VIVO";
+statusTopo.innerText="🔴 AO VIVO";
 }else{
 audio.pause();
-btn.innerText="▶️ Play";
-status.innerText="Parado";
+btn.innerHTML='<i class="fas fa-play"></i>';
+ligado=false;
+statusPlayer.innerText="⚫ OFFLINE";
+statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
