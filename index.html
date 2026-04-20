@@ -140,7 +140,6 @@ cursor:pointer;
 
 <header>
 <h1>🌐 Rádio Palavra Viva</h1>
-
 <div class="status-top">
 <div id="led1"></div>
 <div id="time"></div>
@@ -205,8 +204,10 @@ cursor:pointer;
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<!-- 🔥 CROSSORIGIN (ESSENCIAL) -->
-<audio id="audio" crossorigin="anonymous" src="https://heights-blue-hub-remember.trycloudflare.com/stream"></audio>
+<!-- 🔥 ÁUDIO HTML PURO -->
+<audio id="audio" crossorigin="anonymous">
+  <source src="https://heights-blue-hub-remember.trycloudflare.com/stream" type="audio/mpeg">
+</audio>
 
 <script>
 
@@ -227,9 +228,9 @@ document.getElementById(p).classList.add("active");
 
 /* PEDIDO */
 function enviarPedido(){
-let n=document.getElementById("nome").value.trim();
-let m=document.getElementById("musicaInput").value.trim();
-let c=document.getElementById("cantor").value.trim();
+let n=nome.value.trim();
+let m=musicaInput.value.trim();
+let c=cantor.value.trim();
 
 if(!n||!m||!c) return alert("Preencha tudo");
 
@@ -263,7 +264,7 @@ volumeSlider.oninput=()=> audio.volume=volumeSlider.value;
 /* PLAY */
 function play(){
 
-if(!ctx) initVU();
+if(!ctx) iniciarVU();
 
 if(ctx && ctx.state==="suspended") ctx.resume();
 
@@ -276,8 +277,6 @@ ligado=true;
 
 statusPlayer.innerText="🔴 AO VIVO";
 statusTopo.innerText="🔴 AO VIVO";
-
-if(vuAtivo) animateVU();
 
 }else{
 
@@ -311,7 +310,7 @@ bars.push(segs);
 }
 
 /* INIT VU */
-function initVU(){
+function iniciarVU(){
 try{
 ctx=new (window.AudioContext||window.webkitAudioContext)();
 analyser=ctx.createAnalyser();
@@ -324,18 +323,19 @@ analyser.connect(ctx.destination);
 dataArray=new Uint8Array(analyser.frequencyBinCount);
 
 vuAtivo=true;
+animarVU();
 
 }catch(e){
-console.warn("VU desativado (CORS)");
+console.warn("VU bloqueado (CORS)");
 vuAtivo=false;
 }
 }
 
-/* 🔥 VU COM 3 CORES */
-function animateVU(){
+/* VU 3 CORES */
+function animarVU(){
 if(!vuAtivo) return;
 
-requestAnimationFrame(animateVU);
+requestAnimationFrame(animarVU);
 
 analyser.getByteFrequencyData(dataArray);
 
@@ -347,13 +347,13 @@ bars[i].forEach((seg,index)=>{
 if(index<intensidade){
 
 if(index < bars[i].length * 0.4){
-seg.style.background="#00ff00"; // verde
+seg.style.background="#00ff00";
 }
 else if(index < bars[i].length * 0.7){
-seg.style.background="#ffff00"; // amarelo
+seg.style.background="#ffff00";
 }
 else{
-seg.style.background="#ff0000"; // vermelho
+seg.style.background="#ff0000";
 }
 
 }else{
