@@ -97,16 +97,11 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 </header>
 
 <!-- HOME -->
-<div id="home" class="page active">
-<div class="banner">
-<h2 id="statusTopo">⚫ OFFLINE</h2>
-<p id="musica">⚫ OFFLINE</p>
-<p id="ouvintes">⚫ OFFLINE</p>
-</div>
+
   <div class="banner">
 <h2>🔴 AO VIVO</h2>
-<p id="musica">🟢Tocando: Rádio Master</p>
-<p id="ouvintes">🟡Ouvintes: 0</p>
+<p id="musica">⚫️ Tocando: Rádio Master</p>
+<p id="ouvintes">⚫️ Ouvintes: 0</p>
 
   <!-- VU -->
 <div class="vu" id="vu"></div>
@@ -130,7 +125,8 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
-
+<div id="log"></div>
+</div>
 <!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3 style="text-align:center;">🎵 Pedido</h3>
@@ -251,22 +247,29 @@ carregarPedidos();
 // PLAYER
 const audio=document.getElementById("audio");
 const btn=document.getElementById("btn");
+const status=document.getElementById("status");
 
-let ligado=false;
+/* NAV */
+function show(p){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+document.getElementById(p).classList.add("active");
+}
 
+/* PLAY AUDIO */
 function play(){
+
 if(audio.paused){
 audio.play();
-btn.innerHTML='<i class="fas fa-pause"></i>';
-ligado=true;
-statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
+btn.innerText="⏸️ Pause";
+status.innerText="AO VIVO 🔴";
+
+initVU();
+animateVU();
+
 }else{
 audio.pause();
-btn.innerHTML='<i class="fas fa-play"></i>';
-ligado=false;
-statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
+btn.innerText="▶️ Play";
+status.innerText="Parado";
 }
 }
 
@@ -284,7 +287,7 @@ musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
+ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
 },3000);
 
   
@@ -379,6 +382,11 @@ led1.style.boxShadow="0 0 0px lime";
 
 },1500);
 
+/* OUVINTES */
+setInterval(()=>{
+document.getElementById("ouvintes").innerText=
+"👥 Ouvintes: "+Math.floor(Math.random()*300);
+},3000);
 </script>
 
 </body>
