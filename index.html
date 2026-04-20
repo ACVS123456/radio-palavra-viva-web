@@ -120,7 +120,6 @@ cursor:pointer;
 </div>
 </header>
 
-<!-- HOME -->
 <div id="home" class="page active">
 
 <div class="banner">
@@ -149,63 +148,30 @@ cursor:pointer;
 <div class="card">🔄 Atualize se travar</div>
 </div>
 
-<div style="text-align:center;margin-top:10px;">
-<button onclick="mostrar('pedido')">🎵 Pedido</button>
-<button onclick="mostrar('admin')">🔒 Admin</button>
-</div>
-
-</div>
-
-<!-- PEDIDO -->
-<div id="pedido" class="page">
-<h3>🎵 Pedido</h3>
-<input id="nome" placeholder="Seu nome">
-<input id="musicaInput" placeholder="Música">
-<input id="cantor" placeholder="Cantor">
-<button onclick="enviarPedido()">Enviar</button>
-<button onclick="mostrar('home')">Voltar</button>
-</div>
-
-<!-- ADMIN -->
-<div id="admin" class="page">
-<h3>📋 Pedidos</h3>
-<div id="lista"></div>
-<button onclick="mostrar('home')">Voltar</button>
-</div>
-
 </div>
 
 <!-- AUDIO -->
-<audio id="audio" crossorigin="anonymous">
+<audio id="audio" crossorigin="anonymous" playsinline>
 <source src="https://heights-blue-hub-remember.trycloudflare.com/stream" type="audio/mpeg">
 </audio>
 
 <script>
 
-const audio=document.getElementById("audio");
-const btn=document.getElementById("btn");
-const volume=document.getElementById("volume");
+const audio = document.getElementById("audio");
+const btn = document.getElementById("btn");
+const volume = document.getElementById("volume");
 
-const statusTopo=document.getElementById("statusTopo");
-const statusPlayer=document.getElementById("statusPlayer");
-const musica=document.getElementById("musica");
-const ouvintes=document.getElementById("ouvintes");
+let ligado = false;
+let vuInit = false;
+let bars = [];
 
-let ctx, analyser, source, dataArray;
-let vuInit=false;
-let ligado=false;
-let bars=[];
-
-/* 🔓 DESBLOQUEIO */
+/* 🔓 DESBLOQUEIO SIMPLES (SEM AUDIOCONTEXT) */
 function unlockAudio(){
-audio.muted=false;
-if(ctx && ctx.state==="suspended"){
-ctx.resume();
-}
+audio.muted = false;
 }
 
 /* 🔊 VOLUME */
-volume.oninput=()=>audio.volume=volume.value;
+volume.oninput = () => audio.volume = volume.value;
 
 /* ▶ PLAY */
 async function play(){
@@ -214,52 +180,50 @@ try{
 
 unlockAudio();
 
-if(!vuInit){
-initVU();
-vuInit=true;
-}
-
 if(audio.paused){
 
 await audio.play();
 
-ligado=true;
+ligado = true;
 
-btn.innerText="⏸ PAUSE";
-statusTopo.innerText="🔴 AO VIVO";
-statusPlayer.innerText="🔴 AO VIVO";
-musica.innerText="🎵 Tocando ao vivo";
-ouvintes.innerText="👥 Online";
+btn.innerText = "⏸ PAUSE";
+statusTopo.innerText = "🔴 AO VIVO";
+musica.innerText = "🎵 Tocando ao vivo";
+ouvintes.innerText = "👥 Online";
+
+if(!vuInit){
+initVU();
+vuInit = true;
+}
 
 }else{
 
 audio.pause();
 
-ligado=false;
+ligado = false;
 
-btn.innerText="▶ PLAY";
-statusTopo.innerText="⚫ OFFLINE";
-statusPlayer.innerText="⚫ OFFLINE";
-musica.innerText="⚫ OFFLINE";
-ouvintes.innerText="⚫ OFFLINE";
+btn.innerText = "▶ PLAY";
+statusTopo.innerText = "⚫ OFFLINE";
+musica.innerText = "⚫ OFFLINE";
+ouvintes.innerText = "⚫ OFFLINE";
 }
 
 }catch(e){
-alert("Clique novamente para liberar áudio");
+alert("Clique novamente para liberar o áudio");
 }
 
 }
 
-/* 📊 VU */
-const vu=document.getElementById("vu");
+/* 📊 VU (SEM AudioContext) */
+const vu = document.getElementById("vu");
 
 for(let i=0;i<25;i++){
-let col=document.createElement("div");
-col.className="bar";
+let col = document.createElement("div");
+col.className = "bar";
 
 for(let j=0;j<10;j++){
-let seg=document.createElement("div");
-seg.className="seg";
+let seg = document.createElement("div");
+seg.className = "seg";
 col.appendChild(seg);
 }
 
@@ -267,43 +231,27 @@ vu.appendChild(col);
 bars.push(col.children);
 }
 
-/* 🎛 VU INIT */
+/* 🎛 VU SIMULADO (SEGURO) */
 function initVU(){
-
-ctx=new (window.AudioContext||window.webkitAudioContext)();
-analyser=ctx.createAnalyser();
-analyser.fftSize=256;
-
-source=ctx.createMediaElementSource(audio);
-source.connect(analyser);
-analyser.connect(ctx.destination);
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
 
 animarVU();
 
 }
 
-/* 📊 ANIMA VU */
 function animarVU(){
 
 requestAnimationFrame(animarVU);
 
-if(!analyser) return;
-
-analyser.getByteFrequencyData(dataArray);
+let level = ligado ? Math.random()*10 : 0;
 
 for(let i=0;i<bars.length;i++){
 
-let v=dataArray[i]||0;
-let level=(v/255)*10;
-
 for(let j=0;j<bars[i].length;j++){
 
-if(j<level){
+if(j < level){
 
-if(j<4) bars[i][j].style.background="#00ff00";
-else if(j<7) bars[i][j].style.background="#ffff00";
+if(j < 4) bars[i][j].style.background="#00ff00";
+else if(j < 7) bars[i][j].style.background="#ffff00";
 else bars[i][j].style.background="#ff0000";
 
 }else{
@@ -318,63 +266,28 @@ bars[i][j].style.background="#222";
 
 /* ⏰ RELÓGIO */
 setInterval(()=>{
-time.innerText=new Date().toLocaleTimeString();
-date.innerText=new Date().toLocaleDateString();
+time.innerText = new Date().toLocaleTimeString();
+date.innerText = new Date().toLocaleDateString();
 },1000);
 
 /* 🔴 LED */
 setInterval(()=>{
-led1.style.background=ligado?"red":"#444";
+led1.style.background = ligado ? "red" : "#444";
 },200);
 
-/* 🎵 SIMULAÇÃO */
+/* 🎵 STATUS */
 setInterval(()=>{
 
 if(!ligado){
-musica.innerText="⚫ OFFLINE";
-ouvintes.innerText="⚫ OFFLINE";
+musica.innerText = "⚫ OFFLINE";
+ouvintes.innerText = "⚫ OFFLINE";
 return;
 }
 
-musica.innerText="🎵 Tocando ao vivo";
-ouvintes.innerText="👥 "+(80+Math.floor(Math.random()*300))+" ouvintes";
+musica.innerText = "🟢 Tocando ao vivo";
+ouvintes.innerText = "🟡 " + (80 + Math.floor(Math.random()*300)) + " ouvintes";
 
 },2000);
-
-/* NAV */
-function mostrar(p){
-document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
-document.getElementById(p).classList.add("active");
-}
-
-/* PEDIDOS */
-function enviarPedido(){
-
-let n=nome.value,m=musicaInput.value,c=cantor.value;
-if(!n||!m||!c)return alert("Preencha tudo");
-
-let p=JSON.parse(localStorage.getItem("pedidos")||"[]");
-p.push({n,m,c});
-localStorage.setItem("pedidos",JSON.stringify(p));
-
-alert("Enviado!");
-
-}
-
-/* ADMIN */
-function mostrarAdmin(){
-
-let senha=prompt("Senha:");
-if(senha!=="928374")return;
-
-mostrar("admin");
-
-let lista=document.getElementById("lista");
-let p=JSON.parse(localStorage.getItem("pedidos")||"[]");
-
-lista.innerHTML=p.map(x=>`<div>${x.n} - ${x.m}</div>`).join("");
-
-}
 
 </script>
 
