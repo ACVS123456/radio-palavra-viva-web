@@ -108,7 +108,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <p id="ouvintes">⚫ OFFLINE</p>
 </div>
 
-   <h1>PROBLEMAS TÉCNICOS VOLTARA AS 00:00:00</h1>
+   <h1></h1>
 
   <!-- VU -->
 <div class="vu" id="vu"></div>
@@ -129,6 +129,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <!-- MENU -->
 <div style="text-align:center;">
+<button onclick="mostrar('home')">🏠 Início</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
@@ -327,40 +328,9 @@ ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
 },3000);
 
   
-/* =========================
-   🔥 VU PRO
-========================= */
 
-const vu=document.getElementById("vu");
-const bars=[];
-let ctx, analyser, source, dataArray;
-let smooth=new Array(50).fill(0);
 
-/* cria barras */
-for(let i=0;i<50;i++){
-let b=document.createElement("div");
-b.classList.add("bar");
-vu.appendChild(b);
-bars.push(b);
-}
 
-/* áudio contexto */
-function initVU(){
-
-if(ctx) return;
-
-ctx=new (window.AudioContext||window.webkitAudioContext)();
-
-analyser=ctx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.7;
-
-source=ctx.createMediaElementSource(audio);
-source.connect(analyser);
-analyser.connect(ctx.destination);
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-}
 
 /* animação */
 function animateVU(){
