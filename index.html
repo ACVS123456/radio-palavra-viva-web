@@ -23,45 +23,8 @@ border-radius:50%;
 background:#444;
 box-shadow:0 0 0px lime;
 transition:all 0.5s ease;
-
-  
-.banner{
-background:linear-gradient(135deg,#1db954,#000);
-padding:20px;
-border-radius:10px;
 }
 
-.player{
-position:fixed;
-bottom:0;
-width:100%;
-background:#161b22;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px;
-}
-  
-}
-/* VU */
-.vu{
-display:flex;
-justify-content:center;
-align-items:flex-end;
-gap:2px;
-height:120px;
-margin-top:15px;
-}
-
-.bar{
-width:5px;
-height:10px;
-background:#00ff00;
-border-radius:3px;
-transform-origin:bottom;
-transition:0.05s;
-}
-  
 .clock{text-align:center;}
 .page{display:none;padding:15px;}
 .active{display:block;}
@@ -84,10 +47,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <body>
 
 <header>
-<h1>🌐Rádio Palavra Viva-WEB</h1>
-
-
-
+<h1>Rádio Palavra Viva-WEB</h1>
 
 <div class="status-top">
 <div id="led1"></div>
@@ -100,22 +60,11 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 </header>
 
 <!-- HOME -->
-
-  <div id="home" class="page active">
+<div id="home" class="page active">
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
-</div>
-
-   <h1></h1>
-
-  <!-- VU -->
-<div class="vu" id="vu"></div>
-</div>
-  
-<div class="card">📡 Transmissão 24h ativa</div>
-
 </div>
 
 <div class="grid">
@@ -129,12 +78,10 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 
 <!-- MENU -->
 <div style="text-align:center;">
-<button onclick="mostrar('home')">🏠 Início</button>
 <button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
-<div id="log"></div>
-</div>
+
 <!-- PEDIDO -->
 <div id="pedido" class="page">
 <h3 style="text-align:center;">🎵 Pedido</h3>
@@ -160,8 +107,7 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<audio id="https://favourite-johnson-andrews-terrorists.trycloudflare.com/stream"></audio>
-
+<audio id="audio" src="https://attempting-visible-disciplinary-lenses.trycloudflare.com/stream"></audio>
 
 <script>
 
@@ -177,7 +123,6 @@ function enviarPedido(){
 let nome = document.getElementById("nome").value.trim();
 let musica = document.getElementById("musicaInput").value.trim();
 let cantor = document.getElementById("cantor").value.trim();
-
 
 if(!nome || !musica || !cantor){
 alert("Preencha tudo!");
@@ -255,42 +200,8 @@ carregarPedidos();
 }
 
 // PLAYER
-
-function play(){
-
-if(!audio.src) carregarStream();
-
-if(!iniciado) initAudio();
-
-if(ctx.state==="suspended") ctx.resume();
-
-if(audio.paused){
-audio.play().catch(()=>alert("Clique novamente"));
-
-btn.innerHTML='<i class="fas fa-pause"></i>';
-ligado=true;
-
-statusPlayer.innerText="🔴 AO VIVO";
-statusTopo.innerText="🔴 AO VIVO";
-
-animateVU();
-
-}else{
-audio.pause();
-
-btn.innerHTML='<i class="fas fa-play"></i>';
-ligado=false;
-
-statusPlayer.innerText="⚫ OFFLINE";
-statusTopo.innerText="⚫ OFFLINE";
-}
-}
-/* PLAY AUDIO */
-
 const audio=document.getElementById("audio");
 const btn=document.getElementById("btn");
-const volumeSlider = document.getElementById("volume");
-const gainSlider = document.getElementById("gainControl");
 
 let ligado=false;
 
@@ -319,51 +230,13 @@ date.innerText=new Date().toLocaleDateString();
 // SIMULAÇÕES
 setInterval(()=>{
 if(!ligado) return;
-musica.innerText="🟢 Tocando: "+Math.floor(Math.random()*100);
+musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
 },4000);
 
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡  Ouvintes";
+ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
 },3000);
-
-  
-
-
-
-
-/* animação */
-function animateVU(){
-requestAnimationFrame(animateVU);
-
-if(!analyser) return;
-
-analyser.getByteFrequencyData(dataArray);
-
-let center=bars.length/2;
-
-for(let i=0;i<bars.length;i++){
-
-let v=dataArray[i]||0;
-v=Math.pow(v/255,1.5)*150;
-
-smooth[i]=smooth[i]*0.6+v*0.4;
-
-let h=Math.min(smooth[i],120);
-
-bars[i].style.height=h+"px";
-
-let dist=Math.abs(i-center);
-let move=dist*(h/50);
-
-bars[i].style.transform=
-i<center?`translateX(-${move}px)`:`translateX(${move}px)`;
-
-/* cores */
-bars[i].style.background=
-h<50?"#00ff00":h<90?"#ffff00":"#ff0000";
-}
-}
 
 /* 🔥 LED SUAVE ERICSSON */
 let ledOn = false;
@@ -388,11 +261,6 @@ led1.style.boxShadow="0 0 0px lime";
 
 },1500);
 
-/* OUVINTES */
-setInterval(()=>{
-document.getElementById("ouvintes").innerText=
-"🟡 Ouvintes: "+Math.floor(Math.random()*300);
-},3000);
 </script>
 
 </body>
