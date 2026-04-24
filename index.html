@@ -8,64 +8,181 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{margin:0;font-family:'Segoe UI';background:#0d1117;color:white;padding-bottom:80px;}
-
-header{background:#161b22;display:flex;justify-content:space-between;align-items:center;padding:10px;flex-wrap:wrap;}
-header h1{color:#1db954;font-size:16px;}
-
-.status-top{display:flex;align-items:center;gap:10px;}
-
-/* 🔥 LED ERICSSON */
-#led1{
-width:10px;
-height:10px;
-border-radius:50%;
-background:#444;
-box-shadow:0 0 0px lime;
-transition:all 0.5s ease;
+body{
+margin:0;
+font-family:'Segoe UI';
+background:linear-gradient(180deg,#0d1117,#020202);
+color:white;
+padding-bottom:80px;
 }
 
-.clock{text-align:center;}
-.page{display:none;padding:15px;}
+.container{
+max-width:420px;
+margin:auto;
+padding:10px;
+}
+
+header{
+background:#161b22;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px;
+border-radius:10px;
+box-shadow:0 0 10px #000;
+}
+
+header h1{
+color:#1db954;
+font-size:15px;
+}
+
+.status-top{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:11px;
+}
+
+#led1{
+width:8px;
+height:8px;
+border-radius:50%;
+background:#444;
+}
+
+.banner{
+background:linear-gradient(135deg,#1db954,#000);
+padding:15px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 0 15px rgba(0,0,0,0.6);
+}
+
+.controls{
+margin-top:10px;
+font-size:12px;
+}
+
+input[type=range]{
+width:100%;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:8px;
+margin-top:10px;
+}
+
+.card{
+background:#161b22;
+padding:10px;
+border-radius:10px;
+font-size:12px;
+transition:0.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+background:#1f2937;
+}
+
+.card:first-child{
+text-align:center;
+font-weight:bold;
+background:#1db954;
+color:#000;
+}
+
+button{
+background:#1db954;
+border:none;
+padding:8px 10px;
+color:white;
+border-radius:8px;
+cursor:pointer;
+font-size:12px;
+}
+
+.player{
+position:fixed;
+bottom:0;
+width:100%;
+background:#0d1117;
+border-top:1px solid #222;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px;
+}
+
+.player-controls{
+display:flex;
+gap:12px;
+align-items:center;
+}
+
+.home-btn{
+background:#222;
+padding:10px;
+border-radius:50%;
+}
+
+.play-btn{
+background:#1db954;
+padding:12px;
+border-radius:50%;
+}
+
+input{
+width:100%;
+padding:8px;
+margin:5px 0;
+border:none;
+border-radius:6px;
+}
+
+.page{display:none;}
 .active{display:block;}
 
-.banner{background:linear-gradient(135deg,#1db954,#000);padding:25px;border-radius:10px;text-align:center;}
-.card{background:#161b22;padding:10px;border-radius:10px;font-size:14px;}
-
-.player{position:fixed;bottom:0;width:100%;background:#161b22;display:flex;align-items:center;gap:10px;padding:10px;}
-
-button{background:#1db954;border:none;padding:8px;color:white;border-radius:5px;cursor:pointer;}
-input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
-
-.admin{display:none;}
-.form-box{max-width:300px;margin:20px auto;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;}
+#lista div{
+background:#111;
+padding:6px;
+margin:4px 0;
+border-radius:5px;
+font-size:12px;
+}
 </style>
-
 </head>
 
 <body>
 
-<header>
-<h1>Rádio Palavra Viva-WEB</h1>
+<div class="container">
 
+<header>
+<h1>🌐 Rádio Palavra Viva</h1>
 <div class="status-top">
 <div id="led1"></div>
-
-<div class="clock">
-<div id="time">00:00:00</div>
-<div id="date">--/--/----</div>
-</div>
+<div id="time"></div>
+<div id="date"></div>
 </div>
 </header>
 
-<!-- HOME -->
 <div id="home" class="page active">
+
 <div class="banner">
 <h2 id="statusTopo">⚫ OFFLINE</h2>
 <p id="musica">⚫ OFFLINE</p>
 <p id="ouvintes">⚫ OFFLINE</p>
+
+<div class="controls">
+🔊 Volume
+<input type="range" id="volume" min="0" max="1" step="0.01" value="0.8">
 </div>
+</div>
+
+<div class="card">📡 Transmissão 24h ativa</div>
 
 <div class="grid">
 <div class="card">📻 24h no ar</div>
@@ -74,193 +191,147 @@ input{padding:8px;border-radius:5px;border:none;width:100%;margin-bottom:5px;}
 <div class="card">▶️ Aguarde 10s após clicar</div>
 <div class="card">🔄 Atualize se parar</div>
 </div>
-</div>
 
-<!-- MENU -->
-<div style="text-align:center;">
-<button onclick="mostrar('Home')">🏠 Home</button>
-<button onclick="abrirAdmiPedido')">🎵 Pedir Música</button>
+<div style="text-align:center;margin-top:10px;">
+<button onclick="mostrar('pedido')">🎵 Pedir Música</button>
 <button onclick="abrirAdmin()">🔒 Admin</button>
 </div>
 
-<!-- PEDIDO -->
-<div id="pedido" class="page">
-<h3 style="text-align:center;">🎵 Pedido</h3>
+</div>
 
-<div class="form-box">
+<div id="pedido" class="page">
+<h3>🎵 Pedido</h3>
 <input id="nome" placeholder="Seu nome">
 <input id="musicaInput" placeholder="Música">
 <input id="cantor" placeholder="Cantor">
-
-<button onclick="enviarPedido()">Enviar Pedido</button>
+<button onclick="enviarPedido()">Enviar</button>
+<button onclick="mostrar('home')">⬅ Voltar</button>
 </div>
-</div>
 
-<!-- ADMIN -->
-<div id="admin" class="admin">
-<h3>📋 Pedidos Recebidos</h3>
+<div id="admin" class="page">
+<h3>📋 Pedidos</h3>
 <div id="lista"></div>
+<button onclick="mostrar('home')">⬅ Voltar</button>
 </div>
 
-<!-- PLAYER -->
+</div>
+
 <div class="player">
-<button onclick="play()" id="btn"><i class="fas fa-play"></i></button>
+<div class="player-controls">
+
+<button class="home-btn" onclick="mostrar('home')">
+<i class="fas fa-home"></i>
+</button>
+
+<button class="play-btn" onclick="play()" id="btn">
+<i class="fas fa-play"></i>
+</button>
+
+</div>
+
 <span id="statusPlayer">OFFLINE</span>
 </div>
 
-<audio id="audio" src="https://toilet-students-operate-ciao.trycloudflare.com/stream"></audio>
+<audio id="audio">
+<source src="https://toilet-students-operate-ciao.trycloudflare.com/stream" type="audio/mpeg">
+</audio>
 
 <script>
 
-// TROCA DE TELA
+// ELEMENTOS (CORRIGIDO)
+const audio = document.getElementById("audio");
+const btn = document.getElementById("btn");
+const volumeSlider = document.getElementById("volume");
+
+const time = document.getElementById("time");
+const date = document.getElementById("date");
+const led1 = document.getElementById("led1");
+const statusPlayer = document.getElementById("statusPlayer");
+const statusTopo = document.getElementById("statusTopo");
+const musica = document.getElementById("musica");
+const ouvintes = document.getElementById("ouvintes");
+
+let ligado=false;
+
+/* NAV */
 function mostrar(p){
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 }
 
-// ENVIAR PEDIDO
+/* PEDIDO */
 function enviarPedido(){
+let n=nome.value.trim();
+let m=musicaInput.value.trim();
+let c=cantor.value.trim();
 
-let nome = document.getElementById("nome").value.trim();
-let musica = document.getElementById("musicaInput").value.trim();
-let cantor = document.getElementById("cantor").value.trim();
+if(!n||!m||!c) return alert("Preencha tudo");
 
-if(!nome || !musica || !cantor){
-alert("Preencha tudo!");
-return;
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+pedidos.push({n,m,c});
+localStorage.setItem("pedidos",JSON.stringify(pedidos));
+
+alert("Enviado!");
 }
 
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-pedidos.push({
-  nome,
-  musica,
-  cantor,
-  data: new Date().toLocaleString()
-});
-
-localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-alert("Pedido enviado!");
-
-document.getElementById("nome").value="";
-document.getElementById("musicaInput").value="";
-document.getElementById("cantor").value="";
-}
-
-// ADMIN
+/* ADMIN */
 function abrirAdmin(){
-
-let senha = prompt("Digite a senha:");
-
-if(senha !== "928374"){
-alert("Senha errada!");
-return;
-}
-
-document.getElementById("admin").style.display="block";
+let senha=prompt("Senha:");
+if(senha!=="928374") return alert("Errada");
+mostrar('admin');
 carregarPedidos();
 }
 
-// LISTAR
 function carregarPedidos(){
-
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-let lista = document.getElementById("lista");
-
+let lista=document.getElementById("lista");
+let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
 lista.innerHTML="";
-
-if(pedidos.length === 0){
-lista.innerHTML="Nenhum pedido ainda";
-return;
-}
-
-pedidos.forEach((p, i)=>{
-lista.innerHTML += `
-<div style="margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:5px;">
-<b>${p.nome}</b><br>
-🎵 ${p.musica}<br>
-🎤 ${p.cantor}<br>
-🕒 ${p.data}<br>
-<button onclick="apagar(${i})">Excluir</button>
-</div>
-`;
+pedidos.forEach(p=>{
+lista.innerHTML+=`<div>${p.n} - ${p.m}</div>`;
 });
 }
 
-// APAGAR
-function apagar(index){
+/* VOLUME */
+volumeSlider.oninput=()=> audio.volume=volumeSlider.value;
 
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-
-pedidos.splice(index,1);
-
-localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-carregarPedidos();
-}
-
-// PLAYER
-const audio=document.getElementById("audio");
-const btn=document.getElementById("btn");
-
-let ligado=false;
-
+/* PLAY */
 function play(){
 if(audio.paused){
-audio.play();
+audio.play().catch(()=>alert("Clique novamente"));
 btn.innerHTML='<i class="fas fa-pause"></i>';
 ligado=true;
+
 statusPlayer.innerText="🔴 AO VIVO";
 statusTopo.innerText="🔴 AO VIVO";
+
 }else{
 audio.pause();
 btn.innerHTML='<i class="fas fa-play"></i>';
 ligado=false;
+
 statusPlayer.innerText="⚫ OFFLINE";
 statusTopo.innerText="⚫ OFFLINE";
 }
 }
 
-// RELÓGIO
+/* RELÓGIO */
 setInterval(()=>{
 time.innerText=new Date().toLocaleTimeString();
 date.innerText=new Date().toLocaleDateString();
 },1000);
 
-// SIMULAÇÕES
+/* LED */
 setInterval(()=>{
-if(!ligado) return;
-musica.innerText="🟢 Tocando: Música "+Math.floor(Math.random()*100);
-},4000);
+if(!ligado){led1.style.background="#444";return;}
+led1.style.background=Math.random()>0.5?"red":"#300";
+},200);
 
+/* INFO FAKE */
 setInterval(()=>{
 if(!ligado) return;
-ouvintes.innerText=Math.floor(Math.random()*200)+"🟡 Ouvintes";
+musica.innerText="🟢 Tocando agora...";
+ouvintes.innerText="🟡 Ouvintes online...";
 },3000);
-
-/* 🔥 LED SUAVE ERICSSON */
-let ledOn = false;
-
-setInterval(()=>{
-
-if(!ligado){
-led1.style.background="#444";
-led1.style.boxShadow="0 0 0px lime";
-return;
-}
-
-ledOn = !ledOn;
-
-if(ledOn){
-led1.style.background="lime";
-led1.style.boxShadow="0 0 10px lime";
-}else{
-led1.style.background="#444";
-led1.style.boxShadow="0 0 0px lime";
-}
-
-},1500);
 
 </script>
 
